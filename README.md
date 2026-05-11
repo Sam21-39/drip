@@ -1,39 +1,51 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Drip 💧
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages). 
+**Direct Render Isolated Propagation** — A high-performance, granular reactive state management solution for Flutter.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages). 
--->
+[![pub package](https://img.shields.io/pub/v/drip.svg)](https://pub.dev/packages/drip)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+## Overview
 
-## Features
+Drip is designed to solve the "re-render everything" problem in complex Flutter applications. By implementing **Isolated Propagation**, Drip ensures that state changes only trigger renders in the specific sub-widgets that consume that data, bypassing the traditional widget tree rebuilding process where possible.
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+> [!NOTE]
+> This package is currently in early development. API stability is not guaranteed until version 1.0.0.
 
-## Getting started
+## Features (Coming Soon)
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+- 🚀 **Isolated Rendering**: Update deep widget branches without ancestor rebuilds.
+- 📉 **Low Overhead**: Minimal boilerplate and memory footprint.
+- 🧩 **Sub-widget Scoping**: Easily define state that lives and dies with specific UI segments.
+- ⚡ **Zero-Config Reactivity**: Focus on your logic, let Drip handle the propagation.
 
-## Usage
+## Getting Started
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+Add `drip` to your `pubspec.yaml`:
 
-```dart
-const like = 'sample';
+```yaml
+dependencies:
+  drip: ^0.0.1
 ```
 
-## Additional information
+## Initial Implementation
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+Currently, Drip is in the architectural phase. The initial release provides the foundation for what will become a robust reactivity engine.
+
+```dart
+import 'package:drip/drip.dart';
+
+void main() {
+  // Stay tuned for the first propagation engine release!
+}
+```
+
+## Additional Information
+
+- **Repository**: [Sam21-39/drip](https://github.com/Sam21-39/drip)
+- **Issues**: Please file feature requests and bugs at the [issue tracker](https://github.com/Sam21-39/drip/issues).
+- **Contribution**: Contributions are welcome! See the repository for details.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
