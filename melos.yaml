@@ -1,0 +1,49 @@
+name: drip
+
+packages:
+  - packages/*
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+
+scripts:
+  # Run all tests across all packages
+  test:
+    run: flutter test
+    exec:
+      concurrency: 4
+    packageFilters:
+      dirExists: test
+
+  # Analyze all packages
+  analyze:
+    run: dart analyze --fatal-infos --fatal-warnings
+    exec:
+      concurrency: 4
+
+  # Format check (CI)
+  format:check:
+    run: dart format --set-exit-if-changed .
+    exec:
+      concurrency: 1
+
+  # Format (apply)
+  format:
+    run: dart format .
+    exec:
+      concurrency: 1
+
+  # Publish dry-run for all packages
+  publish:dry:
+    run: dart pub publish --dry-run
+    exec:
+      concurrency: 1
+
+  # Coverage
+  test:coverage:
+    run: flutter test --coverage
+    exec:
+      concurrency: 1
+    packageFilters:
+      dirExists: test

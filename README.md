@@ -1,51 +1,45 @@
-# Drip Core 💧
+# DRIP — Direct Render Isolated Propagation
 
-**Direct Render Isolated Propagation** — A high-performance, granular reactive state management solution for Flutter.
+> "State that drips to the metal."
 
-[![pub package](https://img.shields.io/pub/v/drip.svg)](https://pub.dev/packages/drip_core)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+Sub-widget reactive state for Flutter. State changes propagate directly to `RenderObject` property setters — zero widget rebuilds, zero `setState()`.
 
-## Overview
+## Packages
 
-Drip is designed to solve the "re-render everything" problem in complex Flutter applications. By implementing **Isolated Propagation**, Drip ensures that state changes only trigger renders in the specific sub-widgets that consume that data, bypassing the traditional widget tree rebuilding process where possible.
+| Package | Version | Description |
+|---|---|---|
+| [`drip_core`](packages/drip_core) | [![pub](https://img.shields.io/pub/v/drip_core)](https://pub.dev/packages/drip_core) | Pure Dart reactive engine |
+| `drip_core_flutter` | coming soon | Direct RenderObject bindings |
+| `drip_core_native` | coming soon | FFI shared memory native bridge |
+| `drip_gen` | coming soon | Code generator |
+| `drip_test` | coming soon | Test utilities |
 
-> [!NOTE]
-> This package is currently in early development. API stability is not guaranteed until version 1.0.0.
+## Architecture
 
-## Features (Coming Soon)
-
-- 🚀 **Isolated Rendering**: Update deep widget branches without ancestor rebuilds.
-- 📉 **Low Overhead**: Minimal boilerplate and memory footprint.
-- 🧩 **Sub-widget Scoping**: Easily define state that lives and dies with specific UI segments.
-- ⚡ **Zero-Config Reactivity**: Focus on your logic, let Drip handle the propagation.
-
-## Getting Started
-
-Add `drip` to your `pubspec.yaml`:
-
-```yaml
-dependencies:
-  drip_core: ^0.0.1
+```
+State change → DripBinding → RenderObject.markNeedsPaint() → paint
 ```
 
-## Initial Implementation
+No widget tree traversal. No diffing. No `setState()`.
 
-Currently, Drip is in the architectural phase. The initial release provides the foundation for what will become a robust reactivity engine.
+See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for the invariants that govern every line of code in this repo.
 
-```dart
-import 'package:drip_core/drip_core.dart';
+## Development Status
 
-void main() {
-  // Stay tuned for the first propagation engine release!
-}
+- [x] v0.0.1 — Name placeholder published
+- [ ] v0.1.0-alpha — Reactive engine (DripState, DripComputed, DripEffect, DripScope, DripBatch)
+- [ ] v0.2.0-alpha — Direct render bindings (DripText, DripOpacity, DripColor, DripTransform)
+- [ ] v0.3.0-alpha — DripNode, DripList, scoped DI
+- [ ] v0.4.0-alpha — Native bridge (Android)
+- [ ] v0.4.1-alpha — Native bridge (iOS)
+- [ ] v0.5.0-beta — Full codegen + CLI
+- [ ] v0.6.0-beta — Router + DevTools
+- [ ] v1.0.0 — Stable
+
+## Setup (contributors)
+
+```bash
+fvm dart pub global activate melos
+fvm dart pub global run melos bootstrap
+fvm dart pub global run melos test
 ```
-
-## Additional Information
-
-- **Repository**: [Sam21-39/drip_core](https://github.com/Sam21-39/drip)
-- **Issues**: Please file feature requests and bugs at the [issue tracker](https://github.com/Sam21-39/drip/issues).
-- **Contribution**: Contributions are welcome! See the repository for details.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -1,0 +1,61 @@
+name: DRIP CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  analyze-and-format:
+    name: Analyze & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.3.0'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.0'
+      - run: dart pub global activate melos
+      - run: melos bootstrap
+      - run: melos analyze
+      - run: melos format:check
+
+  unit-tests:
+    name: Tests (${{ matrix.package }})
+    runs-on: ubuntu-latest
+    needs: analyze-and-format
+    strategy:
+      matrix:
+        package: [drip_core, drip_gen, drip_test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.3.0'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.0'
+      - run: dart pub global activate melos
+      - run: melos bootstrap
+      - run: |
+          cd packages/${{ matrix.package }}
+          dart test --coverage=coverage
+      - uses: codecov/codecov-action@v4
+        with:
+          files: packages/${{ matrix.package }}/coverage/lcov.info
+          flags: ${{ matrix.package }}
+
+  publish-dry-run:
+    name: Publish Dry Run
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.3.0'
+      - run: dart pub global activate melos
+      - run: melos bootstrap
+      - run: melos publish:dry
