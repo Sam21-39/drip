@@ -1,6 +1,6 @@
-name: drip
+name: drip_core
 description: "Direct Render Isolated Propagation — sub-widget reactive state for Flutter."
-version: 0.0.1-alpha
+version: 0.0.1
 homepage: https://github.com/Sam21-39/drip
 repository: https://github.com/Sam21-39/drip
 

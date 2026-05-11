@@ -1,8 +1,8 @@
-# Drip 💧
+# Drip Core 💧
 
 **Direct Render Isolated Propagation** — A high-performance, granular reactive state management solution for Flutter.
 
-[![pub package](https://img.shields.io/pub/v/drip.svg)](https://pub.dev/packages/drip)
+[![pub package](https://img.shields.io/pub/v/drip.svg)](https://pub.dev/packages/drip_core)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
@@ -25,7 +25,7 @@ Add `drip` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  drip: ^0.0.1-alpha
+  drip_core: ^0.0.1
 ```
 
 ## Initial Implementation
@@ -33,7 +33,7 @@ dependencies:
 Currently, Drip is in the architectural phase. The initial release provides the foundation for what will become a robust reactivity engine.
 
 ```dart
-import 'package:drip/drip.dart';
+import 'package:drip_core/drip_core.dart';
 
 void main() {
   // Stay tuned for the first propagation engine release!
@@ -42,7 +42,7 @@ void main() {
 
 ## Additional Information
 
-- **Repository**: [Sam21-39/drip](https://github.com/Sam21-39/drip)
+- **Repository**: [Sam21-39/drip_core](https://github.com/Sam21-39/drip)
 - **Issues**: Please file feature requests and bugs at the [issue tracker](https://github.com/Sam21-39/drip/issues).
 - **Contribution**: Contributions are welcome! See the repository for details.
 

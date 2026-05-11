@@ -1,4 +1,4 @@
-import 'package:drip/drip.dart';
+import 'package:drip_core/drip_core.dart';
 
 void main() {
   var awesome = Awesome();
