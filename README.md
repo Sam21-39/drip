@@ -25,7 +25,7 @@ Add `drip` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  drip: ^0.0.1
+  drip: ^0.0.1-alpha
 ```
 
 ## Initial Implementation
