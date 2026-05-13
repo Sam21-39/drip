@@ -1,6 +1,6 @@
 name: drip_core
-description: "Direct Render Isolated Propagation — sub-widget reactive state for Flutter. Core reactive engine (pure Dart)."
-version: 0.0.1
+description: "Direct Render Isolated Propagation — sub-widget reactive state for Flutter."
+version: 0.1.0-alpha
 homepage: https://github.com/Sam21-39/drip
 repository: https://github.com/Sam21-39/drip
 issue_tracker: https://github.com/Sam21-39/drip/issues
@@ -8,6 +8,15 @@ issue_tracker: https://github.com/Sam21-39/drip/issues
 environment:
   sdk: '>=3.3.0 <4.0.0'
 
+#dependencies:
+  # Pure Dart engine — zero runtime dependencies.
+
 dev_dependencies:
   test: ^1.25.0
-  lints: ^4.0.0
+  coverage: ^1.9.0
+
+topics:
+  - state-management
+  - reactive
+  - flutter
+  - dart
