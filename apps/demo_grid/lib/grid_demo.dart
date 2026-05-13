@@ -65,16 +65,13 @@ class _GridDemoState extends State<GridDemo> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  'App Rebuilds: $_appBuildCount',
+                  'Grid Rebuilds: $_appBuildCount',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.greenAccent,
                   ),
                 ),
-                const Text(
-                  'Expected: 1',
-                  style: TextStyle(fontSize: 10, color: Colors.grey),
-                ),
+                const _LiveRebuildCounter(),
               ],
             ),
           ),
@@ -111,6 +108,43 @@ class _GridDemoState extends State<GridDemo> {
           },
         ),
       ),
+    );
+  }
+}
+
+/// A standard Flutter widget that deliberately rebuilds every frame.
+/// This proves that DRIP's zero-rebuild optimizations don't interfere
+/// with normal Flutter state management.
+class _LiveRebuildCounter extends StatefulWidget {
+  const _LiveRebuildCounter();
+
+  @override
+  State<_LiveRebuildCounter> createState() => _LiveRebuildCounterState();
+}
+
+class _LiveRebuildCounterState extends State<_LiveRebuildCounter> {
+  int _count = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
+      if (mounted) setState(() => _count++);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Live Counter: $_count',
+      style: const TextStyle(fontSize: 10, color: Colors.blueAccent),
     );
   }
 }

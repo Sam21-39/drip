@@ -2,6 +2,7 @@ name: drip
 
 packages:
   - packages/*
+  - apps/*
 
 command:
   bootstrap:

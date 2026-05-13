@@ -31,7 +31,10 @@ class DripColorRenderBox extends RenderProxyBox {
       state: state,
       apply: (value) => color = value,
       markNeeds: () {
-        // Rationale: Color changes are paint-only.
+        // Design Decision: markNeedsPaint() is sufficient for background color
+        // changes. Transparency changes on a simple background do not affect
+        // the compositing bits of the render object itself, as it doesn't
+        // introduce a new layer. This matches Flutter's RenderColoredBox.
         if (attached) {
           markNeedsPaint();
         }

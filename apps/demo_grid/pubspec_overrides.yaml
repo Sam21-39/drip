@@ -1,0 +1,6 @@
+# melos_managed_dependency_overrides: drip_core,drip_flutter
+dependency_overrides:
+  drip_core:
+    path: ../../packages/drip_core
+  drip_flutter:
+    path: ../../packages/drip_flutter
