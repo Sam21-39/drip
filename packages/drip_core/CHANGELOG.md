@@ -1,6 +1,6 @@
-## 0.1.0-alpha
+## 0.1.0-alpha (2024-05-13)
 
-**First functional release of the DRIP reactive engine.**
+**Initial Release of the DRIP Reactive Engine.**
 
 ### Added
 - `DripState<T>` — atomic reactive value with version clock and equality check

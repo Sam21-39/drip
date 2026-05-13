@@ -1,15 +1,12 @@
 name: drip_core
-description: "Direct Render Isolated Propagation — sub-widget reactive state for Flutter."
+description: "High-performance, zero-dependency reactive engine for the DRIP framework. Synchronous-only tracking with microtask coalescing."
 version: 0.1.0-alpha
 homepage: https://github.com/Sam21-39/drip
-repository: https://github.com/Sam21-39/drip
+repository: https://github.com/Sam21-39/drip/tree/main/packages/drip_core
 issue_tracker: https://github.com/Sam21-39/drip/issues
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
-
-#dependencies:
-  # Pure Dart engine — zero runtime dependencies.
 
 dev_dependencies:
   test: ^1.25.0
@@ -18,5 +15,6 @@ dev_dependencies:
 topics:
   - state-management
   - reactive
+  - signals
+  - performance
   - flutter
-  - dart
