@@ -1,4 +1,10 @@
-## 0.1.0-alpha (2024-05-13)
+## 0.1.1-alpha (2026-05-13)
+
+### Added
+- `DripListener` interface for external render-layer subscribers.
+- `subscribe`/`unsubscribe` methods on `DripState<T>` for cross-package listener registration.
+
+## 0.1.0-alpha (2026-05-13)
 
 **Initial Release of the DRIP Reactive Engine.**
 

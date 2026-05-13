@@ -87,7 +87,7 @@ packages:
       path: "../drip_core"
       relative: true
     source: path
-    version: "0.1.0-alpha"
+    version: "0.1.1-alpha"
   file:
     dependency: transitive
     description:

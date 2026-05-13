@@ -1,6 +1,7 @@
 name: drip_core_native
 description: "Native platform bindings for the DRIP framework."
 version: 0.1.0-alpha
+publish_to: none
 environment:
   sdk: '>=3.3.0 <4.0.0'
   flutter: '>=3.27.0'

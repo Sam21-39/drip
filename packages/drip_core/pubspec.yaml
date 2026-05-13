@@ -1,6 +1,6 @@
 name: drip_core
 description: "High-performance, zero-dependency reactive engine for the DRIP framework. Synchronous-only tracking with microtask coalescing."
-version: 0.1.0-alpha
+version: 0.1.1-alpha
 homepage: https://github.com/Sam21-39/drip
 repository: https://github.com/Sam21-39/drip/tree/main/packages/drip_core
 issue_tracker: https://github.com/Sam21-39/drip/issues

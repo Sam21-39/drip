@@ -1,6 +1,7 @@
 name: drip_test
 description: "Testing utilities for the DRIP framework."
 version: 0.1.0-alpha
+publish_to: none
 environment:
   sdk: '>=3.3.0 <4.0.0'
 

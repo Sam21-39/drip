@@ -1,0 +1,26 @@
+name: drip_flutter
+description: "Flutter render layer for DRIP — direct RenderObject binding with zero widget rebuilds."
+version: 0.2.0-alpha
+homepage: https://github.com/Sam21-39/drip
+repository: https://github.com/Sam21-39/drip
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.27.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  drip_core: ^0.1.1-alpha
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+topics:
+  - state-management
+  - reactive
+  - flutter
+  - rendering
+  - performance
