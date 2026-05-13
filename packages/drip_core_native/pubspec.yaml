@@ -1,0 +1,16 @@
+name: drip_core_native
+description: "Native platform bindings for the DRIP framework."
+version: 0.1.0-alpha
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.27.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  drip_core:
+    path: ../drip_core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
