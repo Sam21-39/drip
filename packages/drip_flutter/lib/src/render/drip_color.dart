@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import '../binding/drip_binding.dart';
 
-/// A [RenderProxyBox] that supports direct [DripState] binding for background color.
+/// A [RenderProxyBox] that supports direct [DripValue] binding for background color.
 class DripColorRenderBox extends RenderProxyBox {
   Color _color;
   DripBinding<Color>? _binding;
@@ -24,8 +24,8 @@ class DripColorRenderBox extends RenderProxyBox {
     markNeedsPaint();
   }
 
-  /// Binds a [DripState] to this render object.
-  void bindState(DripState<Color> state) {
+  /// Binds a [DripValue] to this render object.
+  void bindState(DripValue<Color> state) {
     _binding?.dispose();
     _binding = DripBinding<Color>(
       state: state,
@@ -68,10 +68,10 @@ class DripColorRenderBox extends RenderProxyBox {
   }
 }
 
-/// A widget that applies a background color from a [DripState<Color>] with zero rebuilds.
+/// A widget that applies a background color from a [DripValue<Color>] with zero rebuilds.
 class DripColor extends SingleChildRenderObjectWidget {
   /// The reactive state source for the background color.
-  final DripState<Color> color;
+  final DripValue<Color> color;
 
   /// Creates a [DripColor] widget.
   const DripColor({

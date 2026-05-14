@@ -3,7 +3,8 @@ import '../tracking/tracking_context.dart';
 import 'drip_state_base.dart';
 
 /// A lazily evaluated, cached derived reactive value.
-class DripComputed<T> extends DripStateBase implements Subscriber {
+class DripComputed<T> extends DripStateBase
+    implements Subscriber, DripValue<T> {
   final T Function() _computation;
   final String? debugName;
 
@@ -85,5 +86,15 @@ class DripComputed<T> extends DripStateBase implements Subscriber {
     }
     _sourcesAtLastEval.clear();
     clearAllSubscribers();
+  }
+
+  @override
+  void subscribe(DripListener listener) {
+    addSubscriber(ListenerSubscriber(listener));
+  }
+
+  @override
+  void unsubscribe(DripListener listener) {
+    removeSubscriber(ListenerSubscriber(listener));
   }
 }

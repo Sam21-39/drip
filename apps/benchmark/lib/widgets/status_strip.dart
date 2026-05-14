@@ -22,7 +22,7 @@ class StatusStrip extends StatelessWidget {
               _Chip('LATENCY', '${f.buildMs.toStringAsFixed(1)}ms'),
               _Chip('BUILDS/FR', '${t.widgetsPerFrame}'),
               _Chip('EFFICIENCY', '${t.efficiency.toStringAsFixed(1)}%'),
-              _Chip('REBUILDS/SEC', '${t.rebuildsPerSec.toStringAsFixed(1)}'),
+              _Chip('REBUILDS/SEC', t.rebuildsPerSec.toStringAsFixed(1)),
               _Chip('DROPPED', '${f.dropped}'),
             ],
           );

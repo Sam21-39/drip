@@ -1,5 +1,6 @@
 import 'package:drip_core/drip_core.dart';
 import 'package:drip_flutter/drip_flutter.dart';
+import 'package:flutter/rendering.dart';
 
 abstract class CounterRepository {
   Future<void> sync(int value);
@@ -10,7 +11,7 @@ class InMemoryCounterRepository implements CounterRepository {
   Future<void> sync(int value) async {
     // Simulate network sync
     await Future.delayed(const Duration(milliseconds: 100));
-    print('Repo synced count: $value');
+    debugPrint('Repo synced count: $value');
   }
 }
 

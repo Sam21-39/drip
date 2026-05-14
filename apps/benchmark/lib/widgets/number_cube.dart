@@ -11,12 +11,13 @@ class NumberCube extends StatelessWidget {
     const brandColor = Color(0xFF00D1FF);
     // Use opacity based on value for intensity, but same color
     final opacity = (value / 1000.0).clamp(0.2, 1.0);
-    final color = brandColor.withOpacity(opacity);
+    final color = brandColor.withValues(alpha: opacity);
 
     return Container(
       decoration: BoxDecoration(
         color: color,
-        border: Border.all(color: Colors.black.withOpacity(0.1), width: 0.5),
+        border:
+            Border.all(color: Colors.black.withValues(alpha: 0.1), width: 0.5),
       ),
       alignment: Alignment.center,
       child: Text(

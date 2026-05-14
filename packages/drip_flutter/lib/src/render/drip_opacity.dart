@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import '../binding/drip_binding.dart';
 
-/// A [RenderProxyBox] that supports direct [DripState] binding for opacity.
+/// A [RenderProxyBox] that supports direct [DripValue] binding for opacity.
 ///
 /// **Design Decision:** Subclassing [RenderProxyBox] instead of [RenderOpacity]
 /// to maintain a clean, binding-focused implementation without being coupled
@@ -29,8 +29,8 @@ class DripOpacityRenderBox extends RenderProxyBox {
     markNeedsPaint();
   }
 
-  /// Binds a [DripState] to this render object.
-  void bindState(DripState<double> state) {
+  /// Binds a [DripValue] to this render object.
+  void bindState(DripValue<double> state) {
     _binding?.dispose();
     _binding = DripBinding<double>(
       state: state,
@@ -74,10 +74,10 @@ class DripOpacityRenderBox extends RenderProxyBox {
   }
 }
 
-/// A widget that applies opacity from a [DripState<double>] with zero rebuilds.
+/// A widget that applies opacity from a [DripValue<double>] with zero rebuilds.
 class DripOpacity extends SingleChildRenderObjectWidget {
   /// The reactive state source for the opacity value.
-  final DripState<double> opacity;
+  final DripValue<double> opacity;
 
   /// Creates a [DripOpacity] widget.
   const DripOpacity({

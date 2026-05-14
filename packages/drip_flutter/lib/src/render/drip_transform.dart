@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import '../binding/drip_binding.dart';
 
-/// A [RenderTransform] that supports direct [DripState] binding for matrix transformations.
+/// A [RenderTransform] that supports direct [DripValue] binding for matrix transformations.
 class DripTransformRenderBox extends RenderTransform {
   DripBinding<Matrix4>? _binding;
   Matrix4 _transform;
@@ -30,8 +30,8 @@ class DripTransformRenderBox extends RenderTransform {
     markNeedsPaint();
   }
 
-  /// Binds a [DripState] to this render object.
-  void bindState(DripState<Matrix4> state) {
+  /// Binds a [DripValue] to this render object.
+  void bindState(DripValue<Matrix4> state) {
     _binding?.dispose();
     _binding = DripBinding<Matrix4>(
       state: state,
@@ -59,10 +59,10 @@ class DripTransformRenderBox extends RenderTransform {
   }
 }
 
-/// A widget that applies a matrix transform from a [DripState<Matrix4>] with zero rebuilds.
+/// A widget that applies a matrix transform from a [DripValue<Matrix4>] with zero rebuilds.
 class DripTransform extends SingleChildRenderObjectWidget {
   /// The reactive state source for the transformation matrix.
-  final DripState<Matrix4> transform;
+  final DripValue<Matrix4> transform;
 
   /// The origin of the transform.
   final Offset? origin;

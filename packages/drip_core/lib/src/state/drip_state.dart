@@ -3,30 +3,8 @@ import '../equality/equality.dart';
 import '../tracking/tracking_context.dart';
 import 'drip_state_base.dart';
 
-/// A public listener interface for external render-layer subscribers.
-abstract interface class DripListener {
-  /// Called when the bound state has changed.
-  void onStateChanged();
-}
-
-/// Internal adapter to bridge [DripListener] to the core [Subscriber] interface.
-class _ListenerSubscriber implements Subscriber {
-  final DripListener listener;
-  _ListenerSubscriber(this.listener);
-
-  @override
-  void markStale() => listener.onStateChanged();
-
-  @override
-  bool operator ==(Object other) =>
-      other is _ListenerSubscriber && other.listener == listener;
-
-  @override
-  int get hashCode => listener.hashCode;
-}
-
 /// An atomic reactive value with a version clock and equality checking.
-class DripState<T> extends DripStateBase {
+class DripState<T> extends DripStateBase implements DripValue<T> {
   T _value;
   final String? debugName;
   final Equality<T> _equality;
@@ -53,14 +31,14 @@ class DripState<T> extends DripStateBase {
     DripBatch.instance.schedulePropagate(propagate);
   }
 
-  /// Subscribes a [DripListener] to this state.
+  @override
   void subscribe(DripListener listener) {
-    addSubscriber(_ListenerSubscriber(listener));
+    addSubscriber(ListenerSubscriber(listener));
   }
 
-  /// Unsubscribes a [DripListener] from this state.
+  @override
   void unsubscribe(DripListener listener) {
-    removeSubscriber(_ListenerSubscriber(listener));
+    removeSubscriber(ListenerSubscriber(listener));
   }
 
   void propagate() {

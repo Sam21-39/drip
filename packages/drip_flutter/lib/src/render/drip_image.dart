@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../binding/drip_binding.dart';
 
-/// A [RenderBox] that supports direct [DripState] binding for [ImageProvider].
+/// A [RenderBox] that supports direct [DripValue] binding for [ImageProvider].
 class DripImageRenderBox extends RenderBox {
   ImageProvider _imageProvider;
   double? _width;
@@ -71,8 +71,8 @@ class DripImageRenderBox extends RenderBox {
     }
   }
 
-  /// Binds a [DripState] to this render object.
-  void bindState(DripState<ImageProvider> state) {
+  /// Binds a [DripValue] to this render object.
+  void bindState(DripValue<ImageProvider> state) {
     _binding?.dispose();
     _binding = DripBinding<ImageProvider>(
       state: state,
@@ -125,10 +125,10 @@ class DripImageRenderBox extends RenderBox {
   }
 }
 
-/// A widget that renders an image from a [DripState<ImageProvider>] with zero rebuilds.
+/// A widget that renders an image from a [DripValue<ImageProvider>] with zero rebuilds.
 class DripImage extends LeafRenderObjectWidget {
   /// The reactive state source for the image provider.
-  final DripState<ImageProvider> state;
+  final DripValue<ImageProvider> state;
 
   /// The width of the image.
   final double? width;

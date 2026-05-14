@@ -8,7 +8,7 @@ import '../binding/drip_binding.dart';
 /// re-implementing the core lifecycle logic.
 abstract class DripCustomBinding<T> {
   /// The reactive state source.
-  final DripState<T> state;
+  final DripValue<T> state;
   DripBinding<T>? _binding;
 
   /// Creates a [DripCustomBinding] for the given [state].

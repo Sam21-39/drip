@@ -111,7 +111,7 @@ class _Sparkline extends StatelessWidget {
     return Container(
       height: 30,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
       ),
       child: ClipRRect(

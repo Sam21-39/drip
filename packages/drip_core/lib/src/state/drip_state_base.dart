@@ -6,6 +6,35 @@ abstract interface class Subscriber {
   void markStale();
 }
 
+/// A public listener interface for external render-layer subscribers.
+abstract interface class DripListener {
+  /// Called when the bound state has changed.
+  void onStateChanged();
+}
+
+/// Internal adapter to bridge [DripListener] to the core [Subscriber] interface.
+class ListenerSubscriber implements Subscriber {
+  final DripListener listener;
+  ListenerSubscriber(this.listener);
+
+  @override
+  void markStale() => listener.onStateChanged();
+
+  @override
+  bool operator ==(Object other) =>
+      other is ListenerSubscriber && other.listener == listener;
+
+  @override
+  int get hashCode => listener.hashCode;
+}
+
+/// A readable reactive value that can be listened to.
+abstract interface class DripValue<T> {
+  T get value;
+  void subscribe(DripListener listener);
+  void unsubscribe(DripListener listener);
+}
+
 /// The abstract base class for all reactive nodes in the DRIP graph.
 abstract class DripStateBase {
   /// The version clock for this state. Starts at 0 and increments on mutation.
