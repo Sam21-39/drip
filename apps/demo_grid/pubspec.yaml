@@ -1,0 +1,28 @@
+name: demo_grid
+description: "DRIP demo: 1000-cell live grid with zero widget rebuilds at 60fps."
+publish_to: none # Demo app — never published to pub.dev
+
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.27.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  drip_core:
+    path: ../../packages/drip_core
+  drip_flutter:
+    path: ../../packages/drip_flutter
+
+dependency_overrides:
+  drip_core:
+    path: ../../packages/drip_core
+  drip_flutter:
+    path: ../../packages/drip_flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
