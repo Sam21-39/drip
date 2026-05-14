@@ -3,69 +3,137 @@ name: DRIP CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.27.0'
 
 jobs:
-  analyze-and-format:
-    name: Analyze & Format
+  # ─────────────────────────────────────────────
+  # Job 1: Format & Static Analysis
+  # ─────────────────────────────────────────────
+  analyze:
+    name: Format & Analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: '3.3.0'
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.27.0'
-      - run: dart pub global activate melos
-      - run: melos bootstrap
-      - run: melos analyze
-      - run: melos format:check
 
-  unit-tests:
-    name: Tests (${{ matrix.package }})
+      - name: Setup Flutter via FVM
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Install Melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap workspace
+        run: melos bootstrap
+
+      - name: Dart format check
+        run: melos run format:check
+
+      - name: Static analysis (fatal-infos + fatal-warnings)
+        run: melos run analyze
+
+  # ─────────────────────────────────────────────
+  # Job 2a: Pure-Dart package tests (drip_core)
+  # ─────────────────────────────────────────────
+  test-drip-core:
+    name: Tests · drip_core
     runs-on: ubuntu-latest
-    needs: analyze-and-format
-    strategy:
-      matrix:
-        package: [drip_core, drip_core_flutter, drip_core_native, drip_gen, drip_test]
+    needs: analyze
     steps:
       - uses: actions/checkout@v4
-      - uses: dart-lang/setup-dart@v1
+
+      - name: Setup Flutter via FVM
+        uses: subosito/flutter-action@v2
         with:
-          sdk: '3.3.0'
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.27.0'
-      - run: dart pub global activate melos
-      - run: melos bootstrap
-      - name: Run Tests
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Install Melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap workspace
+        run: melos bootstrap
+
+      - name: Run tests with coverage
+        working-directory: packages/drip_core
         run: |
-          cd packages/${{ matrix.package }}
-          if [ -f pubspec.yaml ] && [ -d test ]; then
-            # Run with coverage
-            if grep -q "sdk: flutter" pubspec.yaml; then
-              flutter test --coverage
-            else
-              dart pub global activate coverage
-              dart test --coverage=coverage
-              dart pub global run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --packages=.dart_tool/package_config.json --report-on=lib
-            fi
-          fi
-      - uses: codecov/codecov-action@v4
-        with:
-          files: packages/${{ matrix.package }}/coverage/lcov.info
-          flags: ${{ matrix.package }}
+          dart pub global activate coverage
+          dart test --coverage=coverage
+          dart pub global run coverage:format_coverage \
+            --lcov \
+            --in=coverage \
+            --out=coverage/lcov.info \
+            --packages=.dart_tool/package_config.json \
+            --report-on=lib
 
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: packages/drip_core/coverage/lcov.info
+          flags: drip_core
+
+  # ─────────────────────────────────────────────
+  # Job 2b: Flutter package tests (drip_flutter)
+  # ─────────────────────────────────────────────
+  test-drip-flutter:
+    name: Tests · drip_flutter
+    runs-on: ubuntu-latest
+    needs: analyze
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter via FVM
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Install Melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap workspace
+        run: melos bootstrap
+
+      - name: Run tests with coverage
+        working-directory: packages/drip_flutter
+        run: flutter test --coverage
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: packages/drip_flutter/coverage/lcov.info
+          flags: drip_flutter
+
+  # ─────────────────────────────────────────────
+  # Job 3: Publish dry-run (push only)
+  # ─────────────────────────────────────────────
   publish-dry-run:
     name: Publish Dry Run
     runs-on: ubuntu-latest
-    needs: unit-tests
+    needs: [test-drip-core, test-drip-flutter]
+    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
-      - uses: dart-lang/setup-dart@v1
+
+      - name: Setup Flutter via FVM
+        uses: subosito/flutter-action@v2
         with:
-          sdk: '3.3.0'
-      - run: dart pub global activate melos
-      - run: melos bootstrap
-      - run: melos publish:dry
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Install Melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap workspace
+        run: melos bootstrap
+
+      - name: Dry-run publish for all packages
+        run: melos run publish:dry

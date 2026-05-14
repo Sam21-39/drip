@@ -3,92 +3,108 @@
 [![pub package](https://img.shields.io/pub/v/drip_core.svg)](https://pub.dev/packages/drip_core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Direct Render Isolated Propagation** — A high-performance, pure Dart reactive engine designed to scale.
+**Direct Render Isolated Propagation** — A high-performance, pure Dart reactive engine.
 
-DRIP is the core state management engine that powers the DRIP framework. It provides atomic reactive primitives with **synchronous-only tracking** and **microtask-based coalescing**, enabling granular updates that can bypass the widget tree.
+DRIP Core is the zero-dependency state engine powering the DRIP framework. It provides atomic reactive primitives with **synchronous-only tracking** and **microtask-based coalescing**, giving the Flutter render layer the granularity needed to bypass the widget tree entirely.
 
-> ⚠️ **Early Alpha**: This package is in active development. APIs are subject to change until v1.0.0.
+> ⚠️ **Early Alpha**: APIs are stable within the alpha series but subject to change before v1.0.0.
 
 ---
 
 ## ⚡ Performance
+
 - **High Throughput**: Capable of `>10,000,000` writes/sec on modern hardware.
-- **Efficient Invalidation**: Dependency tracking is `O(1)` per read; invalidation is `O(subscribers)`.
+- **O(1) Dependency Registration**: Tracking cost is constant per read.
+- **O(n) Propagation**: Invalidation cost is proportional only to direct subscribers.
 - **Zero Zones**: No `dart:async` Zone overhead for tracking.
-- **Smart Batching**: Multiple synchronous writes result in exactly one propagation pass.
+- **Smart Batching**: Multiple synchronous writes coalesce into exactly one propagation pass.
+
+---
 
 ## 🛠 Core Primitives
 
-| Primitive | Class | Purpose |
-|---|---|---|
-| **State** | `DripState<T>` | The source of truth. Holds a value and a version clock. |
-| **Computed** | `DripComputed<T>` | Lazily evaluated, cached derivation. Only recomputes if sources change. |
-| **Effect** | `DripEffect` | Automatic side-effect. Runs once and then re-runs on dependency changes. |
-| **Scope** | `DripScope` | Resource owner. Disposes all registered states, computeds, and effects in LIFO order. |
+| Class | Role |
+|---|---|
+| `DripState<T>` | The source of truth. Holds a typed value and a version clock. |
+| `DripComputed<T>` | Lazily evaluated, cached derivation. Recomputes only when dependencies change. |
+| `DripEffect` | Automatic side-effect. Runs once on creation, re-runs on dependency change. |
+| `DripScope` | Resource owner. Disposes registered nodes in LIFO order. |
+| `DripValue<T>` | Shared interface — implemented by both `DripState` and `DripComputed`. Use as parameter type when you accept either. |
 
 ---
 
 ## 📖 Usage
 
-### Basic Counter
+### Basic reactive state
+
 ```dart
 import 'package:drip_core/drip_core.dart';
 
-void main() async {
-  final count = dripState(0);
-  
-  // Effect runs immediately, then again whenever 'count' changes.
-  DripEffect(() {
-    print('Count changed: ${count.value}');
-  });
-  
-  // Multiple writes are batched in the same microtask.
-  count.write(1);
-  count.write(2);
-  count.write(3);
-  
-  // prints: "Count changed: 0" (initial)
-  // prints: "Count changed: 3" (after microtask flush)
-}
+final count = dripState(0);
+
+DripEffect(() {
+  print('Count: ${count.value}');
+});
+
+// Multiple synchronous writes → one propagation pass
+count.write(1);
+count.write(2);
+count.write(3);
+
+// Output (after microtask flush):
+// Count: 0  ← initial run
+// Count: 3  ← single batched notification
 ```
 
-### Derived State (Computed)
-Computeds are lazy and cached. They only execute their function if a dependency has changed since the last read.
+### Derived state
+
 ```dart
 final a = dripState(10);
 final b = dripState(20);
-
 final sum = DripComputed(() => a.value + b.value);
 
 print(sum.value); // 30
 a.write(15);
-print(sum.value); // 35
+print(sum.value); // 35  — recomputed lazily on read
 ```
 
-### Resource Management (Scope)
-Use `DripScope` to manage the lifetime of your reactive nodes.
+### Resource management
+
 ```dart
 final scope = DripScope(debugName: 'UserModule');
 
 final name = scope.state('Alice');
 scope.effect(() => print('Hello, ${name.value}'));
 
-// Disposes all nodes created within this scope.
-scope.dispose();
+scope.dispose(); // disposes name and the effect in LIFO order
+```
+
+### Accepting both `DripState` and `DripComputed`
+
+```dart
+void display(DripValue<String> source) {
+  print(source.value);
+}
+
+final raw = dripState('hello');
+final upper = DripComputed(() => raw.value.toUpperCase());
+
+display(raw);   // ✅
+display(upper); // ✅
 ```
 
 ---
 
 ## 🏗 Key Architectural Invariants
 
-1. **Synchronous-Only Tracking**: Dependencies are only tracked during the synchronous execution of a node. Asynchronous gaps (after an `await`) naturally stop tracking, preventing memory leaks and spurious dependencies common in Zone-based frameworks.
-2. **Deterministic Propagation**: Update propagation follows a deterministic order based on the reactive graph.
-3. **One Pass Per Frame**: Updates are batched into microtasks, ensuring that even complex graphs only trigger one propagation pass per synchronous execution block.
-4. **LIFO Disposal**: Scopes dispose of their resources in the reverse order they were created, ensuring safe cleanup of dependent resources.
+1. **Synchronous-Only Tracking**: Dependencies are only tracked during synchronous execution. Async gaps (after `await`) never register spurious dependencies.
+2. **Deterministic Propagation**: Notification order follows the reactive graph.
+3. **One Pass Per Frame**: Updates are batched into microtasks — complex graphs trigger exactly one propagation pass per sync block.
+4. **LIFO Disposal**: Scopes dispose resources in reverse creation order, ensuring safe cleanup of dependent nodes.
+
+---
 
 ## 📦 Installation
-
-Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
@@ -99,4 +115,4 @@ dependencies:
 
 ## 📄 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+MIT — see [LICENSE](../../LICENSE).
