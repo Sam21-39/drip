@@ -1,3 +1,31 @@
+## 0.3.0-alpha
+
+### Added
+
+**Node System**
+- `DripNode` — abstract feature module with owned `DripScope`. Extend to create
+  a named, scoped business logic unit. All state, computed values, and effects
+  are automatically disposed when the node is disposed.
+- `DripNode.register<T>` / `DripNode.resolve<T>` — scoped dependency injection.
+  Singleton by default; no global service locators.
+- `DripNode` lifecycle: `onInit`, `onDispose`, `onBackground`, `onForeground`
+- `DripNodeProvider<N>` — `StatefulWidget` + `InheritedWidget` that creates a node
+  on mount and disposes it on unmount. Handles app lifecycle events automatically.
+- `DripRouteNode` — `DripNode` subclass with route-lifecycle hooks: `onRouteEnter`,
+  `onRouteLeave`. Integrates with Flutter's `RouteObserver`.
+- `BuildContext.node<N>()` extension — ergonomic node lookup
+
+**List System**
+- `DripList<T>` — reactive list with item-level subscriber granularity. Updating
+  index `i` notifies only the subscriber for index `i`, not the entire list.
+- `DripListView<T>` — list widget that rebuilds only the tile at the changed index.
+  Structural changes (add/remove) trigger a minimal list-level rebuild.
+
+### Architecture
+- `DripNode` is pure Dart — unit-testable without a Flutter widget tree
+- No global registries: node resolution via `InheritedWidget` tree lookup only
+- `DripList` item-level granularity proven: 10,000-item list, 1 item change = 1 tile rebuild
+
 ## 0.2.0-alpha (2026-05-13)
 
 **First release of `drip_flutter` — the Flutter direct render binding layer.**

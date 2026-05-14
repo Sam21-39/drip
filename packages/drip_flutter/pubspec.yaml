@@ -1,6 +1,6 @@
 name: drip_flutter
 description: "Flutter render layer for DRIP — direct RenderObject binding with zero widget rebuilds."
-version: 0.2.0-alpha
+version: 0.3.0-alpha
 homepage: https://github.com/Sam21-39/drip
 repository: https://github.com/Sam21-39/drip
 

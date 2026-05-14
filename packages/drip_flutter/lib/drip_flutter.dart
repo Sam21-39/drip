@@ -15,3 +15,13 @@ export 'src/render/drip_transform.dart' show DripTransform;
 // Structural rebuild tools
 export 'src/structural/drip_frame.dart' show DripFrame;
 export 'src/structural/drip_frame_builder.dart' show DripFrameBuilder;
+
+// Node system
+export 'src/node/drip_node.dart';
+export 'src/node/drip_node_provider.dart';
+export 'src/node/drip_route_node.dart';
+export 'src/node/drip_node_context.dart';
+
+// List system
+export 'src/list/drip_list.dart';
+export 'src/list/drip_list_view.dart';
