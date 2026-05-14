@@ -35,13 +35,16 @@ scripts:
     exec:
       concurrency: 1
 
-  # # Publish dry-run — only runs on packages without `publish_to: none`
-  # publish:dry:
-  #   run: dart pub publish --dry-run
-  #   exec:
-  #     concurrency: 1
-  #   packageFilters:
-  #     publishable: true
+  # Publish dry-run — scoped to packages that are ready for pub.dev.
+  # Add new packages here only when they are production-ready.
+  publish:dry:
+    run: dart pub publish --dry-run
+    exec:
+      concurrency: 1
+    packageFilters:
+      scope:
+        - drip_core
+        - drip_flutter
 
   # Coverage
   test:coverage:
