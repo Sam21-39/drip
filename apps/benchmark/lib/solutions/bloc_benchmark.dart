@@ -1,51 +1,89 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../services/solution_controller.dart';
+import '../services/frame_updater.dart';
 import '../services/rebuild_tracker.dart';
-import '../widgets/solution_card.dart';
-import '../widgets/counter_text.dart';
-import '../widgets/progress_bar.dart';
+import '../widgets/number_cube.dart';
 
-class CounterBloc extends Cubit<int> implements SolutionController {
-  CounterBloc() : super(0);
-  
-  @override
-  void onValue(int v) => emit(v);
-  
-  @override
-  void reset() => emit(0);
-
-  @override
-  int get currentValue => state;
+class CubeState {
+  final List<int> values;
+  const CubeState(this.values);
 }
 
-class BlocBenchmark extends StatelessWidget {
-  final CounterBloc controller;
-  final bool isRunning;
-  final int? rank;
+class UpdateCubes {
+  final List<int> values;
+  const UpdateCubes(this.values);
+}
 
-  const BlocBenchmark({
-    super.key,
-    required this.controller,
-    required this.isRunning,
-    this.rank,
-  });
+class CubeBloc extends Bloc<UpdateCubes, CubeState> {
+  CubeBloc() : super(CubeState(List<int>.filled(200, 0))) {
+    on<UpdateCubes>((e, emit) => emit(CubeState(e.values)));
+  }
+}
+
+class BlocBenchmark extends StatefulWidget {
+  final bool isRunning;
+  const BlocBenchmark({super.key, required this.isRunning});
+
+  @override
+  State<BlocBenchmark> createState() => _BlocBenchmarkState();
+}
+
+class _BlocBenchmarkState extends State<BlocBenchmark> {
+  late CubeBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = CubeBloc();
+    if (widget.isRunning) {
+      _start();
+    }
+  }
+
+  @override
+  void didUpdateWidget(BlocBenchmark oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isRunning && !oldWidget.isRunning) {
+      _start();
+    } else if (!widget.isRunning && oldWidget.isRunning) {
+      _stop();
+    }
+  }
+
+  void _start() {
+    FrameUpdater.instance.start((vals) => _bloc.add(UpdateCubes(List.from(vals))));
+  }
+
+  void _stop() {
+    FrameUpdater.instance.stop();
+  }
+
+  @override
+  void dispose() {
+    _stop();
+    _bloc.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SolutionCard(
-      id: 'bloc',
-      isRunning: isRunning,
-      rank: rank,
-      counter: BlocBuilder<CounterBloc, int>(
-        builder: (context, state) {
-          RebuildTracker.instance.record('bloc', state);
-          return CounterText(value: state);
-        },
-      ),
-      progressBar: BlocBuilder<CounterBloc, int>(
-        builder: (context, state) {
-          return ProgressBar(value: state, color: Colors.blueAccent);
+    return BlocProvider.value(
+      value: _bloc,
+      child: BlocBuilder<CubeBloc, CubeState>(
+        builder: (ctx, state) {
+          RebuildTracker.instance.record();
+          return GridView.builder(
+            padding: EdgeInsets.zero,
+            itemCount: 200,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 10,
+              childAspectRatio: 1,
+            ),
+            itemBuilder: (_, i) {
+              RebuildTracker.instance.record();
+              return NumberCube(value: state.values[i], index: i);
+            },
+          );
         },
       ),
     );

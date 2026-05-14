@@ -1,13 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart' as rp;
-import 'package:provider/provider.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
-
-import 'services/benchmark_coordinator.dart';
 import 'services/rebuild_tracker.dart';
-import 'services/solution_controller.dart';
+import 'services/frame_profiler.dart';
+import 'services/session_history.dart';
+import 'widgets/solution_buttons.dart';
 import 'widgets/status_strip.dart';
+import 'widgets/active_stats.dart';
 
 import 'solutions/drip_benchmark.dart';
 import 'solutions/getx_benchmark.dart';
@@ -16,235 +14,306 @@ import 'solutions/bloc_benchmark.dart';
 import 'solutions/provider_benchmark.dart';
 import 'solutions/setstate_benchmark.dart';
 
-class BenchmarkScreen extends rp.ConsumerStatefulWidget {
+class BenchmarkScreen extends StatefulWidget {
   const BenchmarkScreen({super.key});
 
   @override
-  rp.ConsumerState<BenchmarkScreen> createState() => _BenchmarkScreenState();
+  State<BenchmarkScreen> createState() => _BenchmarkScreenState();
 }
 
-class _BenchmarkScreenState extends rp.ConsumerState<BenchmarkScreen> {
-  late CounterDrip dripCtrl;
-  late CounterGetX getxCtrl;
-  late CounterBloc blocCtrl;
-  late ProviderCounter providerCtrl;
-  
-  // SetState uses its own internal state, so we need a GlobalKey to reach it
-  final GlobalKey<SetStateBenchmarkState> setStateKey = GlobalKey();
-
-  late BenchmarkCoordinator coordinator;
-  bool isRunning = false;
-  List<String> ranking = [];
+class _BenchmarkScreenState extends State<BenchmarkScreen> {
+  String _activeId = 'drip';
+  bool _isRunning = false;
+  int _secondsRemaining = 30;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    dripCtrl = CounterDrip();
-    getxCtrl = Get.put(CounterGetX());
-    blocCtrl = CounterBloc();
-    providerCtrl = ProviderCounter();
-
-    // The ordering here matters for the fan-out in the coordinator
-    coordinator = BenchmarkCoordinator([]);
+    FrameProfiler.instance.start();
+    RebuildTracker.instance.activate(_activeId);
   }
 
-  void _initCoordinator() {
-    coordinator = BenchmarkCoordinator([
-      dripCtrl,
-      getxCtrl,
-      blocCtrl,
-      providerCtrl,
-      setStateKey.currentState!, // Riverpod handled separately
-      ref.read(riverpodBenchmarkProvider),
-    ]);
+  @override
+  void dispose() {
+    _timer?.cancel();
+    FrameProfiler.instance.stop();
+    super.dispose();
   }
 
-  void _start() async {
-    if (setStateKey.currentState == null) {
-       // Wait a frame for the key to be attached
-       await Future.delayed(Duration.zero);
+  void _onSelect(String id) {
+    if (_isRunning) return;
+    setState(() {
+      _activeId = id;
+      RebuildTracker.instance.activate(id);
+    });
+  }
+
+  void _toggleBenchmark() {
+    if (_isRunning) {
+      _stopBenchmark();
+    } else {
+      _startBenchmark();
     }
-    
-    _initCoordinator();
-
-    setState(() {
-      isRunning = true;
-      ranking = [];
-    });
-
-    await coordinator.start(onDone: () {
-      if (mounted) {
-        setState(() {
-          isRunning = false;
-          ranking = _computeRanking();
-        });
-      }
-    });
   }
 
-  void _reset() {
-    dripCtrl.reset();
-    getxCtrl.reset();
-    blocCtrl.reset();
-    providerCtrl.reset();
-    setStateKey.currentState?.reset();
-    ref.read(counterProvider.notifier).state = 0;
+  void _startBenchmark() {
     RebuildTracker.instance.reset();
-    
     setState(() {
-      isRunning = false;
-      ranking = [];
+      _isRunning = true;
+      _secondsRemaining = 30;
+    });
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_secondsRemaining > 0) {
+          _secondsRemaining--;
+        } else {
+          _stopBenchmark();
+        }
+      });
     });
   }
 
-  List<String> _computeRanking() {
+  void _stopBenchmark() {
+    _timer?.cancel();
+    _timer = null;
+    
+    // Save result to history
     final t = RebuildTracker.instance;
-    final ids = ['drip', 'getx', 'riverpod', 'bloc', 'provider', 'setstate'];
-    ids.sort((a, b) {
-      final cmp = t.wasted(a).compareTo(t.wasted(b));
-      return cmp != 0 ? cmp : t.total(a).compareTo(t.total(b));
-    });
-    return ids;
-  }
+    final f = FrameProfiler.instance;
+    if (t.totalWidgets > 0) {
+      SessionHistory.instance.addResult(BenchmarkResult(
+        id: _activeId,
+        totalRebuilds: t.totalWidgets,
+        efficiency: t.efficiency,
+        avgFps: f.fps,
+        timestamp: DateTime.now(),
+      ));
+    }
 
-  int? _getRank(String id) {
-    if (ranking.isEmpty) return null;
-    return ranking.indexOf(id) + 1;
+    setState(() {
+      _isRunning = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: providerCtrl),
-      ],
-      child: BlocProvider.value(
-        value: blocCtrl,
-        child: Scaffold(
-          backgroundColor: const Color(0xFFF5F7FA),
-          body: SafeArea(
-            child: Column(
-              children: [
-                _buildHeader(),
-                const StatusStrip(),
-                _buildControls(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Column(
-                      children: [
-                        DripBenchmark(
-                          controller: dripCtrl,
-                          isRunning: isRunning,
-                          rank: _getRank('drip'),
+    const brandColor = Color(0xFF00D1FF);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0A0B),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const StatusStrip(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Column(
+                children: [
+                  SolutionButtons(
+                    activeId: _activeId,
+                    onSelect: _onSelect,
+                    isRunning: _isRunning,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _toggleBenchmark,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _isRunning ? Colors.redAccent : brandColor,
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: Text(
+                            _isRunning ? 'STOP BENCHMARK' : 'START 30s RACE',
+                            style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
+                          ),
                         ),
-                        GetXBenchmark(
-                          controller: getxCtrl,
-                          isRunning: isRunning,
-                          rank: _getRank('getx'),
-                        ),
-                        RiverpodBenchmark(
-                          ref: ref,
-                          isRunning: isRunning,
-                          rank: _getRank('riverpod'),
-                        ),
-                        BlocBenchmark(
-                          controller: blocCtrl,
-                          isRunning: isRunning,
-                          rank: _getRank('bloc'),
-                        ),
-                        ProviderBenchmark(
-                          controller: providerCtrl,
-                          isRunning: isRunning,
-                          rank: _getRank('provider'),
-                        ),
-                        SetStateBenchmark(
-                          key: setStateKey,
-                          isRunning: isRunning,
-                          rank: _getRank('setstate'),
+                      ),
+                      if (_isRunning) ...[
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white10,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${_secondsRemaining}s',
+                            style: const TextStyle(
+                              color: brandColor,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
                         ),
                       ],
-                    ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+            const ActiveStats(),
+            const Divider(height: 1, color: Colors.white10),
+            Expanded(
+              flex: 3,
+              child: _buildActiveSolution(),
+            ),
+            const Divider(height: 1, color: Colors.white10),
+            Expanded(
+              flex: 2,
+              child: _buildHistory(),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildActiveSolution() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: switch (_activeId) {
+        'drip' => DripBenchmark(key: const ValueKey('drip'), isRunning: _isRunning),
+        'getx' => GetXBenchmark(key: const ValueKey('getx'), isRunning: _isRunning),
+        'riverpod' => RiverpodBenchmark(key: const ValueKey('riverpod'), isRunning: _isRunning),
+        'bloc' => BlocBenchmark(key: const ValueKey('bloc'), isRunning: _isRunning),
+        'provider' => ProviderBenchmark(key: const ValueKey('provider'), isRunning: _isRunning),
+        'setstate' => SetStateBenchmark(key: const ValueKey('setstate'), isRunning: _isRunning),
+        _ => const SizedBox.shrink(),
+      },
+    );
+  }
+
+  Widget _buildHistory() {
     return Container(
-      padding: const EdgeInsets.all(20),
-      color: Colors.white,
-      child: const Column(
+      color: const Color(0xFF141417),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '100M Count Benchmark',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Text(
+              'SESSION HISTORY',
+              style: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold),
+            ),
           ),
-          SizedBox(height: 4),
-          Text(
-            'Comparing real widget rebuilds and engine timings',
-            style: TextStyle(color: Colors.grey),
+          Expanded(
+            child: StreamBuilder<void>(
+              stream: SessionHistory.instance.stream,
+              builder: (context, snapshot) {
+                final history = SessionHistory.instance.history;
+                if (history.isEmpty) {
+                  return const Center(
+                    child: Text('No results yet', style: TextStyle(color: Colors.white10)),
+                  );
+                }
+
+                // Calculate ranks based on efficiency
+                final rankedList = List<BenchmarkResult>.from(history)
+                  ..sort((a, b) => b.efficiency.compareTo(a.efficiency));
+
+                return ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: history.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1, color: Colors.white10),
+                  itemBuilder: (context, index) {
+                    final res = history[index];
+                    final rank = rankedList.indexOf(res) + 1;
+                    final isTop3 = rank <= 3;
+
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Row(
+                        children: [
+                          _HistoryTag(res.id, isTop3: isTop3, rank: rank),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${res.totalRebuilds} rebuilds',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold, 
+                                    fontSize: 13,
+                                    color: isTop3 ? const Color(0xFF00D1FF) : Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  'Efficiency: ${res.efficiency.toStringAsFixed(1)}% • ${res.avgFps.toStringAsFixed(0)} FPS',
+                                  style: const TextStyle(color: Colors.white38, fontSize: 11),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            _formatTime(res.timestamp),
+                            style: const TextStyle(color: Colors.white24, fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildControls() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: ElevatedButton(
-              onPressed: isRunning ? null : _start,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1A1C1E),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: const Text('START BENCHMARK', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: OutlinedButton(
-              onPressed: isRunning ? null : _reset,
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: const Text('RESET'),
-            ),
-          ),
-        ],
-      ),
-    );
+  String _formatTime(DateTime dt) {
+    return '${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
   }
 }
 
-// Helper to allow Riverpod to be treated as a SolutionController
-final riverpodBenchmarkProvider = rp.Provider<SolutionController>((ref) {
-  return _RiverpodController(ref);
-});
-
-class _RiverpodController implements SolutionController {
-  final rp.Ref ref;
-  _RiverpodController(this.ref);
+class _HistoryTag extends StatelessWidget {
+  final String id;
+  final bool isTop3;
+  final int rank;
+  const _HistoryTag(this.id, {this.isTop3 = false, this.rank = 0});
 
   @override
-  void onValue(int v) => ref.read(counterProvider.notifier).state = v;
+  Widget build(BuildContext context) {
+    const brandColor = Color(0xFF00D1FF);
+    
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (isTop3) ...[
+          _getMedal(rank),
+          const SizedBox(width: 6),
+        ],
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: isTop3 ? brandColor.withOpacity(0.2) : Colors.white10,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            id.toUpperCase(),
+            style: TextStyle(
+              color: isTop3 ? brandColor : Colors.white70,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
-  @override
-  void reset() => ref.read(counterProvider.notifier).state = 0;
-
-  @override
-  int get currentValue => ref.read(counterProvider);
+  Widget _getMedal(int rank) {
+    switch (rank) {
+      case 1: return const Text('🥇', style: TextStyle(fontSize: 14));
+      case 2: return const Text('🥈', style: TextStyle(fontSize: 14));
+      case 3: return const Text('🥉', style: TextStyle(fontSize: 14));
+      default: return const SizedBox.shrink();
+    }
+  }
 }

@@ -16,12 +16,28 @@ class BenchmarkApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const brandColor = Color(0xFF00D1FF);
+    
     return GetMaterialApp(
-      title: 'Flutter Rebuild Benchmark',
+      title: 'Flutter High-Stress Benchmark',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF0A0A0B),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: brandColor,
+          brightness: Brightness.dark,
+          surface: const Color(0xFF141417),
+        ),
         useMaterial3: true,
+        fontFamily: 'Inter',
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: brandColor,
+            foregroundColor: Colors.black,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
       ),
       home: const BenchmarkScreen(),
     );

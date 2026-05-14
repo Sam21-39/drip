@@ -1,43 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../services/frame_updater.dart';
 import '../services/rebuild_tracker.dart';
-import '../widgets/solution_card.dart';
-import '../widgets/counter_text.dart';
-import '../widgets/progress_bar.dart';
+import '../widgets/number_cube.dart';
 
-final counterProvider = StateProvider<int>((ref) => 0);
+final cubeProvider = StateProvider<List<int>>(
+  (ref) => List<int>.filled(200, 0),
+);
 
-class RiverpodBenchmark extends ConsumerWidget {
-  final WidgetRef ref;
+class RiverpodBenchmark extends ConsumerStatefulWidget {
   final bool isRunning;
-  final int? rank;
-
-  const RiverpodBenchmark({
-    super.key,
-    required this.ref,
-    required this.isRunning,
-    this.rank,
-  });
+  const RiverpodBenchmark({super.key, required this.isRunning});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SolutionCard(
-      id: 'riverpod',
-      isRunning: isRunning,
-      rank: rank,
-      counter: Consumer(
-        builder: (context, ref, _) {
-          final v = ref.watch(counterProvider);
-          RebuildTracker.instance.record('riverpod', v);
-          return CounterText(value: v);
-        },
-      ),
-      progressBar: Consumer(
-        builder: (context, ref, _) {
-          final v = ref.watch(counterProvider);
-          return ProgressBar(value: v, color: Colors.indigo);
-        },
-      ),
+  ConsumerState<RiverpodBenchmark> createState() => _RiverpodBenchmarkState();
+}
+
+class _RiverpodBenchmarkState extends ConsumerState<RiverpodBenchmark> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isRunning) {
+      _start();
+    }
+  }
+
+  @override
+  void didUpdateWidget(RiverpodBenchmark oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isRunning && !oldWidget.isRunning) {
+      _start();
+    } else if (!widget.isRunning && oldWidget.isRunning) {
+      _stop();
+    }
+  }
+
+  void _start() {
+    FrameUpdater.instance.start((vals) {
+      ref.read(cubeProvider.notifier).state = List<int>.from(vals);
+    });
+  }
+
+  void _stop() {
+    FrameUpdater.instance.stop();
+  }
+
+  @override
+  void dispose() {
+    _stop();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(
+      builder: (ctx, ref, _) {
+        final values = ref.watch(cubeProvider);
+        RebuildTracker.instance.record();
+        return GridView.builder(
+          padding: EdgeInsets.zero,
+          itemCount: 200,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 10,
+            childAspectRatio: 1,
+          ),
+          itemBuilder: (_, i) {
+            RebuildTracker.instance.record();
+            return NumberCube(value: values[i], index: i);
+          },
+        );
+      },
     );
   }
 }

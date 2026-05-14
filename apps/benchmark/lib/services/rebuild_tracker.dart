@@ -4,52 +4,67 @@ class RebuildTracker {
   RebuildTracker._();
   static final instance = RebuildTracker._();
 
-  final _total = <String, int>{};
-  final _wasted = <String, int>{};
-  final _lastValue = <String, int>{};
-  final _timestamps = <String, List<int>>{}; // epoch ms per rebuild
+  String _activeId = '';
+  int _totalWidgetBuilds = 0;
+  int _totalFrameBuilds = 0;
+  int _thisFrameWidgetBuilds = 0;
 
-  // Call this from inside build() — nowhere else
-  void record(String id, int renderedValue) {
-    final prev = _lastValue[id];
-    final changed = prev != renderedValue;
+  final _widgetBuildsHistory = <int>[]; // last 60 frames
 
-    _total[id] = (_total[id] ?? 0) + 1;
-    if (!changed) _wasted[id] = (_wasted[id] ?? 0) + 1;
-    _lastValue[id] = renderedValue;
+  // Called inside every build()
+  void record() {
+    _totalWidgetBuilds++;
+    _thisFrameWidgetBuilds++;
+    _notifyStream();
+  }
 
-    (_timestamps[id] ??= []).add(DateTime.now().millisecondsSinceEpoch);
+  // Called by FrameProfiler once per frame boundary
+  void onFrameEnd() {
+    if (_thisFrameWidgetBuilds > 0) {
+      _totalFrameBuilds++;
+      _widgetBuildsHistory.add(_thisFrameWidgetBuilds);
+      if (_widgetBuildsHistory.length > 60) _widgetBuildsHistory.removeAt(0);
+    }
+    _thisFrameWidgetBuilds = 0;
+    _notifyStream();
+  }
 
-    _controller.add(null); // notify UI
+  void activate(String id) {
+    _activeId = id;
+    reset();
   }
 
   void reset() {
-    _total.clear();
-    _wasted.clear();
-    _lastValue.clear();
-    _timestamps.clear();
-    _controller.add(null);
+    _totalWidgetBuilds = 0;
+    _totalFrameBuilds = 0;
+    _thisFrameWidgetBuilds = 0;
+    _widgetBuildsHistory.clear();
+    _notifyStream();
   }
 
-  int total(String id) => _total[id] ?? 0;
-  int wasted(String id) => _wasted[id] ?? 0;
-  int necessary(String id) => total(id) - wasted(id);
-  
-  double efficiency(String id) {
-    final t = total(id);
-    return t == 0 ? 100.0 : (necessary(id) / t * 100);
+  String get activeId => _activeId;
+  int get totalWidgets => _totalWidgetBuilds;
+  int get totalFrames => _totalFrameBuilds;
+
+  int get widgetsPerFrame => _widgetBuildsHistory.isEmpty ? 0 : _widgetBuildsHistory.last;
+
+  // Efficiency: (Expected Builds / Actual Builds)
+  // Expected = frames * (1 boundary + 200 cubes)
+  double get efficiency {
+    if (_totalWidgetBuilds == 0) return 100.0;
+    final expected = _totalFrameBuilds * 201;
+    if (expected >= _totalWidgetBuilds) return 100.0;
+    return (expected / _totalWidgetBuilds) * 100.0;
   }
 
-  // Rebuilds per second over last 30 samples
-  double rebuildsPerSec(String id) {
-    final ts = _timestamps[id];
-    if (ts == null || ts.length < 2) return 0;
-    final window = ts.length > 30 ? ts.sublist(ts.length - 30) : ts;
-    final spanMs = window.last - window.first;
-    if (spanMs <= 0) return 0;
-    return (window.length - 1) / spanMs * 1000;
+  double get rebuildsPerSec {
+    if (_totalFrameBuilds == 0) return 0;
+    return _totalWidgetBuilds / (_totalFrameBuilds / 60.0);
   }
 
-  final _controller = StreamController<void>.broadcast();
-  Stream<void> get stream => _controller.stream;
+  List<int> get sparkline => List.unmodifiable(_widgetBuildsHistory);
+
+  final _ctrl = StreamController<void>.broadcast();
+  Stream<void> get stream => _ctrl.stream;
+  void _notifyStream() => _ctrl.add(null);
 }

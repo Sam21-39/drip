@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/scheduler.dart';
+import 'rebuild_tracker.dart';
 
 class FrameProfiler {
   FrameProfiler._();
@@ -15,31 +16,33 @@ class FrameProfiler {
   double get rasterMs => _rasterMs;
   int get dropped => _dropped;
 
+  bool _listening = false;
+
   void start() {
-    _dropped = 0;
-    SchedulerBinding.instance.addTimingsCallback(_onFrame);
+    if (_listening) return;
+    _listening = true;
+    SchedulerBinding.instance.addTimingsCallback(_onTimings);
   }
 
   void stop() {
-    SchedulerBinding.instance.removeTimingsCallback(_onFrame);
+    _listening = false;
+    SchedulerBinding.instance.removeTimingsCallback(_onTimings);
   }
 
-  void _onFrame(List<FrameTiming> timings) {
+  void _onTimings(List<FrameTiming> timings) {
     for (final t in timings) {
-      final buildDuration = t.buildDuration.inMicroseconds / 1000;
-      final rasterDuration = t.rasterDuration.inMicroseconds / 1000;
-      final totalMs = buildDuration + rasterDuration;
+      final b = t.buildDuration.inMicroseconds / 1000.0;
+      final r = t.rasterDuration.inMicroseconds / 1000.0;
+      _buildMs = _buildMs * 0.85 + b * 0.15; // exponential moving avg
+      _rasterMs = _rasterMs * 0.85 + r * 0.15;
+      _fps = (b + r) > 0 ? (1000 / (b + r)).clamp(1, 120) : 60.0;
+      if ((b + r) > 16.67) _dropped++;
 
-      _buildMs = (_buildMs * 0.85) + (buildDuration * 0.15); // EMA
-      _rasterMs = (_rasterMs * 0.85) + (rasterDuration * 0.15);
-      _fps = totalMs > 0 ? (1000 / totalMs).clamp(0, 120) : 60;
-
-      // 16.67ms budget for 60fps
-      if (totalMs > 16.67) _dropped++;
+      RebuildTracker.instance.onFrameEnd();
     }
-    _controller.add(null);
+    _ctrl.add(null);
   }
 
-  final _controller = StreamController<void>.broadcast();
-  Stream<void> get stream => _controller.stream;
+  final _ctrl = StreamController<void>.broadcast();
+  Stream<void> get stream => _ctrl.stream;
 }

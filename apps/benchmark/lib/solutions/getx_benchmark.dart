@@ -1,50 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../services/solution_controller.dart';
+import '../services/frame_updater.dart';
 import '../services/rebuild_tracker.dart';
-import '../widgets/solution_card.dart';
-import '../widgets/counter_text.dart';
-import '../widgets/progress_bar.dart';
+import '../widgets/number_cube.dart';
 
-class CounterGetX extends GetxController implements SolutionController {
-  var value = 0.obs;
-  
-  @override
-  void onValue(int v) => value.value = v;
-  
-  @override
-  void reset() => value.value = 0;
-
-  @override
-  int get currentValue => value.value;
+class CubeGetXController extends GetxController {
+  final values = <int>[].obs;
+  void updateValues(List<int> vals) => values.assignAll(vals);
 }
 
-class GetXBenchmark extends StatelessWidget {
-  final CounterGetX controller;
+class GetXBenchmark extends StatefulWidget {
   final bool isRunning;
-  final int? rank;
+  const GetXBenchmark({super.key, required this.isRunning});
 
-  const GetXBenchmark({
-    super.key,
-    required this.controller,
-    required this.isRunning,
-    this.rank,
-  });
+  @override
+  State<GetXBenchmark> createState() => _GetXBenchmarkState();
+}
+
+class _GetXBenchmarkState extends State<GetXBenchmark> {
+  late CubeGetXController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = Get.put(CubeGetXController());
+    if (widget.isRunning) {
+      _start();
+    }
+  }
+
+  @override
+  void didUpdateWidget(GetXBenchmark oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isRunning && !oldWidget.isRunning) {
+      _start();
+    } else if (!widget.isRunning && oldWidget.isRunning) {
+      _stop();
+    }
+  }
+
+  void _start() {
+    FrameUpdater.instance.start((vals) => _ctrl.updateValues(vals));
+  }
+
+  void _stop() {
+    FrameUpdater.instance.stop();
+  }
+
+  @override
+  void dispose() {
+    _stop();
+    Get.delete<CubeGetXController>();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SolutionCard(
-      id: 'getx',
-      isRunning: isRunning,
-      rank: rank,
-      counter: Obx(() {
-        final v = controller.value.value;
-        RebuildTracker.instance.record('getx', v);
-        return CounterText(value: v);
-      }),
-      progressBar: Obx(() {
-        return ProgressBar(value: controller.value.value, color: Colors.purple);
-      }),
-    );
+    return Obx(() {
+      final list = _ctrl.values;
+      RebuildTracker.instance.record();
+      return GridView.builder(
+        padding: EdgeInsets.zero,
+        itemCount: list.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 10,
+          childAspectRatio: 1,
+        ),
+        itemBuilder: (_, i) {
+          RebuildTracker.instance.record();
+          return NumberCube(value: list[i], index: i);
+        },
+      );
+    });
   }
 }

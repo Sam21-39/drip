@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/frame_profiler.dart';
+import '../services/rebuild_tracker.dart';
 
 class StatusStrip extends StatelessWidget {
   const StatusStrip({super.key});
@@ -7,19 +8,22 @@ class StatusStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: const Color(0xFF1A1C1E),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      color: Colors.black,
       child: StreamBuilder<void>(
         stream: FrameProfiler.instance.stream,
         builder: (_, __) {
           final f = FrameProfiler.instance;
+          final t = RebuildTracker.instance;
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _Chip('FPS', f.fps.toStringAsFixed(0)),
-              _Chip('Frame', '${f.buildMs.toStringAsFixed(1)}ms'),
-              _Chip('Raster', '${f.rasterMs.toStringAsFixed(1)}ms'),
-              _Chip('Dropped', '${f.dropped}'),
+              _Chip('LATENCY', '${f.buildMs.toStringAsFixed(1)}ms'),
+              _Chip('BUILDS/FR', '${t.widgetsPerFrame}'),
+              _Chip('EFFICIENCY', '${t.efficiency.toStringAsFixed(1)}%'),
+              _Chip('REBUILDS/SEC', '${t.rebuildsPerSec.toStringAsFixed(1)}'),
+              _Chip('DROPPED', '${f.dropped}'),
             ],
           );
         },
@@ -35,16 +39,17 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '$label: ',
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
+          label,
+          style: const TextStyle(color: Colors.white38, fontSize: 9, fontWeight: FontWeight.bold),
         ),
         Text(
           value,
           style: const TextStyle(
-            color: Colors.white,
+            color: Color(0xFF00D1FF),
             fontSize: 12,
             fontWeight: FontWeight.bold,
             fontFamily: 'monospace',
