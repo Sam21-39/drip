@@ -92,7 +92,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  drip_core: ^0.1.0-alpha
+  drip_core: ^0.1.1-alpha
 ```
 
 ---
