@@ -1,0 +1,15 @@
+.dart_tool/
+.fvm/
+.vscode/
+io/
+build/
+ios/
+web/
+macos/
+darwin/
+windows/
+android/
+
+.fvm_home/flutter_sdk/
+.fvm_home/dart_sdk/
+.fvm_home/fvm_sdk/
