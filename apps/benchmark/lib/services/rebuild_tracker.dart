@@ -46,7 +46,8 @@ class RebuildTracker {
   int get totalWidgets => _totalWidgetBuilds;
   int get totalFrames => _totalFrameBuilds;
 
-  int get widgetsPerFrame => _widgetBuildsHistory.isEmpty ? 0 : _widgetBuildsHistory.last;
+  int get widgetsPerFrame =>
+      _widgetBuildsHistory.isEmpty ? 0 : _widgetBuildsHistory.last;
 
   // Efficiency: (Expected Builds / Actual Builds)
   // Expected = frames * (1 boundary + 200 cubes)

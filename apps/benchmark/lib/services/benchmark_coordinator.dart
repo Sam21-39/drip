@@ -37,9 +37,9 @@ class BenchmarkCoordinator {
   }) async {
     final recv = ReceivePort();
     await Isolate.spawn(benchmarkIsolate, recv.sendPort);
-    
+
     final completer = Completer<void>();
-    
+
     recv.listen((msg) {
       if (msg == -1) {
         onDone();
@@ -49,7 +49,7 @@ class BenchmarkCoordinator {
         onValue(msg as int);
       }
     });
-    
+
     return completer.future;
   }
 }

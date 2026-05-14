@@ -31,7 +31,7 @@ class SolutionButtons extends StatelessWidget {
       alignment: WrapAlignment.center,
       children: solutions.map((s) {
         final isActive = s.id == activeId;
-        
+
         return ActionChip(
           label: Text(s.label),
           onPressed: isRunning ? null : () => onSelect(s.id),

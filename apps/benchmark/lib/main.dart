@@ -17,7 +17,7 @@ class BenchmarkApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const brandColor = Color(0xFF00D1FF);
-    
+
     return GetMaterialApp(
       title: 'Flutter High-Stress Benchmark',
       debugShowCheckedModeBanner: false,
@@ -35,7 +35,8 @@ class BenchmarkApp extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: brandColor,
             foregroundColor: Colors.black,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
       ),

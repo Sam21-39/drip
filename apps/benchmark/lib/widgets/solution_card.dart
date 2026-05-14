@@ -20,15 +20,15 @@ class SolutionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color brandColor = id == 'drip' ? Colors.blue : Colors.grey[800]!;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: id == 'drip' 
-          ? Border.all(color: brandColor, width: 1.5)
-          : Border.all(color: Colors.grey[200]!, width: 1),
+        border: id == 'drip'
+            ? Border.all(color: brandColor, width: 1.5)
+            : Border.all(color: Colors.grey[200]!, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -76,13 +76,20 @@ class SolutionCard extends StatelessWidget {
 
   String _getDisplayName(String id) {
     switch (id) {
-      case 'drip': return 'DRIP';
-      case 'getx': return 'GetX';
-      case 'riverpod': return 'Riverpod';
-      case 'bloc': return 'BLoC';
-      case 'provider': return 'Provider';
-      case 'setstate': return 'setState';
-      default: return id.toUpperCase();
+      case 'drip':
+        return 'DRIP';
+      case 'getx':
+        return 'GetX';
+      case 'riverpod':
+        return 'Riverpod';
+      case 'bloc':
+        return 'BLoC';
+      case 'provider':
+        return 'Provider';
+      case 'setstate':
+        return 'setState';
+      default:
+        return id.toUpperCase();
     }
   }
 }
@@ -118,7 +125,8 @@ class _RankBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = rank == 1 ? Colors.green : (rank == 6 ? Colors.red : Colors.blueGrey);
+    final color =
+        rank == 1 ? Colors.green : (rank == 6 ? Colors.red : Colors.blueGrey);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(

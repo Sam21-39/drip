@@ -14,10 +14,10 @@ class StatsRow extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _Stat('rebuilds', '${t.total(id)}'),
-            _Stat('wasted', '${t.wasted(id)}'),
-            _Stat('efficiency', '${t.efficiency(id).toStringAsFixed(0)}%'),
-            _Stat('builds/sec', t.rebuildsPerSec(id).toStringAsFixed(1)),
+            _Stat('rebuilds', '${t.totalWidgets}'),
+            _Stat('widgets/frame', '${t.widgetsPerFrame}'),
+            _Stat('efficiency', '${t.efficiency.toStringAsFixed(0)}%'),
+            _Stat('builds/sec', t.rebuildsPerSec.toStringAsFixed(1)),
           ],
         );
       },

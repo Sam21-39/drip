@@ -51,7 +51,8 @@ class _BlocBenchmarkState extends State<BlocBenchmark> {
   }
 
   void _start() {
-    FrameUpdater.instance.start((vals) => _bloc.add(UpdateCubes(List.from(vals))));
+    FrameUpdater.instance
+        .start((vals) => _bloc.add(UpdateCubes(List.from(vals))));
   }
 
   void _stop() {

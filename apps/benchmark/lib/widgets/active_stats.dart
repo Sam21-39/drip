@@ -35,7 +35,9 @@ class ActiveStats extends StatelessWidget {
                       const Text(
                         'ACTIVE SOLUTION',
                         style: TextStyle(
-                            fontSize: 8, color: Colors.white24, fontWeight: FontWeight.bold),
+                            fontSize: 8,
+                            color: Colors.white24,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -82,7 +84,8 @@ class _Stat extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 9, color: Colors.white38, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+              fontSize: 9, color: Colors.white38, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 2),
         Text(

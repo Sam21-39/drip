@@ -13,7 +13,10 @@ class SolutionMeta {
 }
 
 const List<SolutionMeta> solutions = [
-  SolutionMeta(id: 'drip', label: 'Drip', color: Color(0xFF00E5FF)), // Using a brand-like cyan for Drip
+  SolutionMeta(
+      id: 'drip',
+      label: 'Drip',
+      color: Color(0xFF00E5FF)), // Using a brand-like cyan for Drip
   SolutionMeta(id: 'getx', label: 'GetX', color: Color(0xFF639922)),
   SolutionMeta(id: 'riverpod', label: 'Riverpod', color: Color(0xFF1D9E75)),
   SolutionMeta(id: 'bloc', label: 'Bloc', color: Color(0xFF378ADD)),

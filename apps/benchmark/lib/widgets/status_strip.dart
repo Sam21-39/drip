@@ -44,7 +44,8 @@ class _Chip extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Colors.white38, fontSize: 9, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+              color: Colors.white38, fontSize: 9, fontWeight: FontWeight.bold),
         ),
         Text(
           value,

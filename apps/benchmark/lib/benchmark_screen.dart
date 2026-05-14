@@ -78,7 +78,7 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
   void _stopBenchmark() {
     _timer?.cancel();
     _timer = null;
-    
+
     // Save result to history
     final t = RebuildTracker.instance;
     final f = FrameProfiler.instance;
@@ -123,20 +123,23 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
                         child: ElevatedButton(
                           onPressed: _toggleBenchmark,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: _isRunning ? Colors.redAccent : brandColor,
+                            backgroundColor:
+                                _isRunning ? Colors.redAccent : brandColor,
                             foregroundColor: Colors.black,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
                           child: Text(
                             _isRunning ? 'STOP BENCHMARK' : 'START 30s RACE',
-                            style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, letterSpacing: 1),
                           ),
                         ),
                       ),
                       if (_isRunning) ...[
                         const SizedBox(width: 12),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
                             color: Colors.white10,
                             borderRadius: BorderRadius.circular(8),
@@ -177,12 +180,18 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: switch (_activeId) {
-        'drip' => DripBenchmark(key: const ValueKey('drip'), isRunning: _isRunning),
-        'getx' => GetXBenchmark(key: const ValueKey('getx'), isRunning: _isRunning),
-        'riverpod' => RiverpodBenchmark(key: const ValueKey('riverpod'), isRunning: _isRunning),
-        'bloc' => BlocBenchmark(key: const ValueKey('bloc'), isRunning: _isRunning),
-        'provider' => ProviderBenchmark(key: const ValueKey('provider'), isRunning: _isRunning),
-        'setstate' => SetStateBenchmark(key: const ValueKey('setstate'), isRunning: _isRunning),
+        'drip' =>
+          DripBenchmark(key: const ValueKey('drip'), isRunning: _isRunning),
+        'getx' =>
+          GetXBenchmark(key: const ValueKey('getx'), isRunning: _isRunning),
+        'riverpod' => RiverpodBenchmark(
+            key: const ValueKey('riverpod'), isRunning: _isRunning),
+        'bloc' =>
+          BlocBenchmark(key: const ValueKey('bloc'), isRunning: _isRunning),
+        'provider' => ProviderBenchmark(
+            key: const ValueKey('provider'), isRunning: _isRunning),
+        'setstate' => SetStateBenchmark(
+            key: const ValueKey('setstate'), isRunning: _isRunning),
         _ => const SizedBox.shrink(),
       },
     );
@@ -198,7 +207,10 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
             padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Text(
               'SESSION HISTORY',
-              style: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Colors.white38,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
@@ -208,7 +220,8 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
                 final history = SessionHistory.instance.history;
                 if (history.isEmpty) {
                   return const Center(
-                    child: Text('No results yet', style: TextStyle(color: Colors.white10)),
+                    child: Text('No results yet',
+                        style: TextStyle(color: Colors.white10)),
                   );
                 }
 
@@ -219,7 +232,8 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: history.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1, color: Colors.white10),
+                  separatorBuilder: (_, __) =>
+                      const Divider(height: 1, color: Colors.white10),
                   itemBuilder: (context, index) {
                     final res = history[index];
                     final rank = rankedList.indexOf(res) + 1;
@@ -238,21 +252,25 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
                                 Text(
                                   '${res.totalRebuilds} rebuilds',
                                   style: TextStyle(
-                                    fontWeight: FontWeight.bold, 
+                                    fontWeight: FontWeight.bold,
                                     fontSize: 13,
-                                    color: isTop3 ? const Color(0xFF00D1FF) : Colors.white,
+                                    color: isTop3
+                                        ? const Color(0xFF00D1FF)
+                                        : Colors.white,
                                   ),
                                 ),
                                 Text(
                                   'Efficiency: ${res.efficiency.toStringAsFixed(1)}% • ${res.avgFps.toStringAsFixed(0)} FPS',
-                                  style: const TextStyle(color: Colors.white38, fontSize: 11),
+                                  style: const TextStyle(
+                                      color: Colors.white38, fontSize: 11),
                                 ),
                               ],
                             ),
                           ),
                           Text(
                             _formatTime(res.timestamp),
-                            style: const TextStyle(color: Colors.white24, fontSize: 10),
+                            style: const TextStyle(
+                                color: Colors.white24, fontSize: 10),
                           ),
                         ],
                       ),
@@ -281,7 +299,7 @@ class _HistoryTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const brandColor = Color(0xFF00D1FF);
-    
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -310,10 +328,14 @@ class _HistoryTag extends StatelessWidget {
 
   Widget _getMedal(int rank) {
     switch (rank) {
-      case 1: return const Text('🥇', style: TextStyle(fontSize: 14));
-      case 2: return const Text('🥈', style: TextStyle(fontSize: 14));
-      case 3: return const Text('🥉', style: TextStyle(fontSize: 14));
-      default: return const SizedBox.shrink();
+      case 1:
+        return const Text('🥇', style: TextStyle(fontSize: 14));
+      case 2:
+        return const Text('🥈', style: TextStyle(fontSize: 14));
+      case 3:
+        return const Text('🥉', style: TextStyle(fontSize: 14));
+      default:
+        return const SizedBox.shrink();
     }
   }
 }

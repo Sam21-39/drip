@@ -59,9 +59,9 @@ class DripRenderParagraph extends RenderParagraph {
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
-    // DRIP updates happen in microtasks, which can dirty the layout between 
-    // frames. RenderParagraph.hitTestChildren requires a valid layout to 
-    // calculate glyph offsets. If dirty, we skip hit testing to avoid 
+    // DRIP updates happen in microtasks, which can dirty the layout between
+    // frames. RenderParagraph.hitTestChildren requires a valid layout to
+    // calculate glyph offsets. If dirty, we skip hit testing to avoid
     // "Text layout not available" crashes.
     if (debugNeedsLayout) return false;
     return super.hitTestChildren(result, position: position);

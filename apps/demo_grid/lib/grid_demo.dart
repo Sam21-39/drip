@@ -42,7 +42,8 @@ class GridDemoScreen extends StatefulWidget {
   State<GridDemoScreen> createState() => _GridDemoScreenState();
 }
 
-class _GridDemoScreenState extends State<GridDemoScreen> with SingleTickerProviderStateMixin {
+class _GridDemoScreenState extends State<GridDemoScreen>
+    with SingleTickerProviderStateMixin {
   Timer? _updateTimer;
   late final Ticker _frameTicker;
   int _tick = 0;

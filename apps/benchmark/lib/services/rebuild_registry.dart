@@ -42,7 +42,7 @@ class RebuildRegistry {
   int necessary(String id) => total(id) - wasted(id);
   int get taps => _tapCount;
   double perTap(String id) => taps == 0 ? 0 : total(id) / taps;
-  
+
   int efficiency(String id) {
     final t = total(id);
     if (t == 0) return 100;
