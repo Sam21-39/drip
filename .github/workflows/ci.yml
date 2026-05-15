@@ -35,16 +35,16 @@ jobs:
         run: melos bootstrap
 
       - name: Dart format check
-        run: melos run format:check
+        run: melos run format:check --scope="drip_*"
 
       - name: Static analysis (fatal-infos + fatal-warnings)
-        run: melos run analyze
+        run: melos run analyze --scope="drip_*"
 
   # ─────────────────────────────────────────────
-  # Job 2a: Pure-Dart package tests (drip_core)
+  # Job 2: Tests
   # ─────────────────────────────────────────────
-  test-drip-core:
-    name: Tests · drip_core
+  test:
+    name: Tests · Released Packages
     runs-on: ubuntu-latest
     needs: analyze
     steps:
@@ -63,54 +63,10 @@ jobs:
         run: melos bootstrap
 
       - name: Run tests with coverage
-        working-directory: packages/drip_core
-        run: |
-          dart pub global activate coverage
-          dart test --coverage=coverage
-          dart pub global run coverage:format_coverage \
-            --lcov \
-            --in=coverage \
-            --out=coverage/lcov.info \
-            --packages=.dart_tool/package_config.json \
-            --report-on=lib
+        run: melos run test:coverage --no-private
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
-        with:
-          files: packages/drip_core/coverage/lcov.info
-          flags: drip_core
-
-  # ─────────────────────────────────────────────
-  # Job 2b: Flutter package tests (drip_flutter)
-  # ─────────────────────────────────────────────
-  test-drip-flutter:
-    name: Tests · drip_flutter
-    runs-on: ubuntu-latest
-    needs: analyze
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Flutter via FVM
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
-
-      - name: Install Melos
-        run: dart pub global activate melos
-
-      - name: Bootstrap workspace
-        run: melos bootstrap
-
-      - name: Run tests with coverage
-        working-directory: packages/drip_flutter
-        run: flutter test --coverage
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
-        with:
-          files: packages/drip_flutter/coverage/lcov.info
-          flags: drip_flutter
 
   # ─────────────────────────────────────────────
   # Job 3: Publish dry-run (push only)
@@ -118,7 +74,7 @@ jobs:
   publish-dry-run:
     name: Publish Dry Run
     runs-on: ubuntu-latest
-    needs: [test-drip-core, test-drip-flutter]
+    needs: test
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
@@ -136,4 +92,4 @@ jobs:
         run: melos bootstrap
 
       - name: Dry-run publish for all packages
-        run: melos run publish:dry
+        run: melos run publish:dry --no-private
