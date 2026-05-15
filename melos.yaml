@@ -16,24 +16,34 @@ scripts:
       concurrency: 4
     packageFilters:
       dirExists: test
+      noPrivate: true
 
   # Analyze all packages
   analyze:
     run: dart analyze --fatal-infos --fatal-warnings
     exec:
       concurrency: 4
+    packageFilters:
+      scope:
+        - "drip_*"
 
   # Format check (CI)
   format:check:
     run: dart format --set-exit-if-changed .
     exec:
       concurrency: 1
+    packageFilters:
+      scope:
+        - "drip_*"
 
   # Format (apply)
   format:
     run: dart format .
     exec:
       concurrency: 1
+    packageFilters:
+      scope:
+        - "drip_*"
 
   # Publish dry-run — scoped to packages that are ready for pub.dev.
   # Add new packages here only when they are production-ready.
@@ -42,9 +52,7 @@ scripts:
     exec:
       concurrency: 1
     packageFilters:
-      scope:
-        - drip_core
-        - drip_flutter
+      noPrivate: true
 
   # Coverage
   test:coverage:
@@ -53,3 +61,4 @@ scripts:
       concurrency: 1
     packageFilters:
       dirExists: test
+      noPrivate: true

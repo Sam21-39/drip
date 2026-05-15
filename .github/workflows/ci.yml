@@ -35,10 +35,10 @@ jobs:
         run: melos bootstrap
 
       - name: Dart format check
-        run: melos run format:check --scope="drip_*"
+        run: melos run format:check --no-select
 
       - name: Static analysis (fatal-infos + fatal-warnings)
-        run: melos run analyze --scope="drip_*"
+        run: melos run analyze --no-select
 
   # ─────────────────────────────────────────────
   # Job 2: Tests
@@ -63,7 +63,7 @@ jobs:
         run: melos bootstrap
 
       - name: Run tests with coverage
-        run: melos run test:coverage --no-private
+        run: melos run test:coverage --no-select
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -92,4 +92,4 @@ jobs:
         run: melos bootstrap
 
       - name: Dry-run publish for all packages
-        run: melos run publish:dry --no-private
+        run: melos run publish:dry --no-select
