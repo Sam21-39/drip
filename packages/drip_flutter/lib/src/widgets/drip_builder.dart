@@ -21,7 +21,8 @@ class DripBuilder<T> extends StatefulWidget {
   State<DripBuilder<T>> createState() => _DripBuilderState<T>();
 }
 
-class _DripBuilderState<T> extends State<DripBuilder<T>> implements DripListener {
+class _DripBuilderState<T> extends State<DripBuilder<T>>
+    implements DripListener {
   late T _currentValue;
 
   @override

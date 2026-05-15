@@ -9,7 +9,8 @@ class DripAsyncBuilder<T> extends StatefulWidget {
   final DripAsync<T> state;
   final Widget Function(BuildContext context, T? previousData)? loading;
   final Widget Function(BuildContext context, T value) data;
-  final Widget Function(BuildContext context, Object error, StackTrace stackTrace, T? previousData)? error;
+  final Widget Function(BuildContext context, Object error,
+      StackTrace stackTrace, T? previousData)? error;
 
   const DripAsyncBuilder({
     super.key,
@@ -23,7 +24,8 @@ class DripAsyncBuilder<T> extends StatefulWidget {
   State<DripAsyncBuilder<T>> createState() => _DripAsyncBuilderState<T>();
 }
 
-class _DripAsyncBuilderState<T> extends State<DripAsyncBuilder<T>> implements DripListener {
+class _DripAsyncBuilderState<T> extends State<DripAsyncBuilder<T>>
+    implements DripListener {
   late DripAsyncValue<T> _currentAsyncValue;
 
   @override
@@ -63,7 +65,8 @@ class _DripAsyncBuilderState<T> extends State<DripAsyncBuilder<T>> implements Dr
     return switch (value) {
       DripLoading<T>() => _buildLoading(context, value.previousData),
       DripData<T>() => widget.data(context, value.value),
-      DripError<T>() => _buildError(context, value.error, value.stackTrace, value.previousData),
+      DripError<T>() =>
+        _buildError(context, value.error, value.stackTrace, value.previousData),
     };
   }
 
@@ -72,18 +75,21 @@ class _DripAsyncBuilderState<T> extends State<DripAsyncBuilder<T>> implements Dr
       return widget.loading!(context, previousData);
     }
     assert(() {
-      debugPrint('DripAsyncBuilder: Warning: No loading callback provided. Using default CircularProgressIndicator.');
+      debugPrint(
+          'DripAsyncBuilder: Warning: No loading callback provided. Using default CircularProgressIndicator.');
       return true;
     }());
     return const Center(child: CircularProgressIndicator());
   }
 
-  Widget _buildError(BuildContext context, Object error, StackTrace stackTrace, T? previousData) {
+  Widget _buildError(BuildContext context, Object error, StackTrace stackTrace,
+      T? previousData) {
     if (widget.error != null) {
       return widget.error!(context, error, stackTrace, previousData);
     }
     assert(() {
-      debugPrint('DripAsyncBuilder: Warning: No error callback provided. Using default Text.');
+      debugPrint(
+          'DripAsyncBuilder: Warning: No error callback provided. Using default Text.');
       debugPrint('Error: $error\n$stackTrace');
       return true;
     }());

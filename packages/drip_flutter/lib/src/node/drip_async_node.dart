@@ -14,7 +14,8 @@ mixin DripAsyncNode on DripNode {
 
   /// Creates a [DripAsync], automatically scopes it to the node's lifecycle,
   /// immediately calls [DripAsync.run] with the given computation, and returns the state.
-  DripAsync<T> asyncFromFuture<T>(Future<T> Function() computation, {String? debugName}) {
+  DripAsync<T> asyncFromFuture<T>(Future<T> Function() computation,
+      {String? debugName}) {
     final state = DripAsync<T>(debugName: debugName);
     registerDisposal(state.clearAllSubscribers);
     state.run(computation);
@@ -25,18 +26,19 @@ mixin DripAsyncNode on DripNode {
   /// begins listening to the [stream], and returns the state.
   DripAsync<T> asyncFromStream<T>(Stream<T> stream, {String? debugName}) {
     final state = DripAsync<T>(debugName: debugName);
-    
+
     final subscription = stream.listen(
       (data) => state.setData(data),
-      onError: (Object error, StackTrace stackTrace) => state.setError(error, stackTrace),
+      onError: (Object error, StackTrace stackTrace) =>
+          state.setError(error, stackTrace),
       onDone: () {},
     );
-    
+
     registerDisposal(() {
       subscription.cancel();
       state.clearAllSubscribers();
     });
-    
+
     return state;
   }
 }

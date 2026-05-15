@@ -12,7 +12,8 @@ class CustomEquality<T> implements Equality<T> {
 
 void main() {
   group('DripSelect', () {
-    testWidgets('DS-1.1: Initial combined value rendered', (WidgetTester tester) async {
+    testWidgets('DS-1.1: Initial combined value rendered',
+        (WidgetTester tester) async {
       final state1 = dripState('Hello');
       final state2 = dripState('World');
 
@@ -29,7 +30,8 @@ void main() {
       expect(find.text('Hello World'), findsOneWidget);
     });
 
-    testWidgets('DS-1.2 & DS-1.3: Rebuilds when sources change', (WidgetTester tester) async {
+    testWidgets('DS-1.2 & DS-1.3: Rebuilds when sources change',
+        (WidgetTester tester) async {
       final state1 = dripState('Hello');
       final state2 = dripState('World');
       int buildCount = 0;
@@ -62,7 +64,8 @@ void main() {
       expect(buildCount, 3);
     });
 
-    testWidgets('DS-1.4: Does NOT rebuild when non-selected state changes', (WidgetTester tester) async {
+    testWidgets('DS-1.4: Does NOT rebuild when non-selected state changes',
+        (WidgetTester tester) async {
       final state1 = dripState('Hello');
       final state2 = dripState('World');
       final unrelated = dripState('Unrelated');
@@ -89,7 +92,9 @@ void main() {
       expect(buildCount, 1); // Should not rebuild
     });
 
-    testWidgets('DS-1.5: Does NOT rebuild when sources change to same combined result', (WidgetTester tester) async {
+    testWidgets(
+        'DS-1.5: Does NOT rebuild when sources change to same combined result',
+        (WidgetTester tester) async {
       final firstName = dripState('John');
       final lastName = dripState('Doe');
       int buildCount = 0;
@@ -110,7 +115,7 @@ void main() {
       expect(buildCount, 1);
 
       // Mutate sources such that combined result is the same
-      // Wait, if first name is 'John ' and last name is 'Doe', wait... let's just make one change 
+      // Wait, if first name is 'John ' and last name is 'Doe', wait... let's just make one change
       // where combined result evaluates to same string? Not easy with simple concat.
       // Let's do length.
       final strState = dripState('abc');
@@ -137,7 +142,8 @@ void main() {
       expect(buildCountLen, 1); // No rebuild because length is still 3!
     });
 
-    testWidgets('DS-1.6: Internal DripComputed disposed on widget unmount', (WidgetTester tester) async {
+    testWidgets('DS-1.6: Internal DripComputed disposed on widget unmount',
+        (WidgetTester tester) async {
       final state = dripState('Hello');
 
       await tester.pumpWidget(
@@ -157,7 +163,8 @@ void main() {
       expect(state.subscribers.length, 0);
     });
 
-    testWidgets('DS-1.7: Works with Dart 3 record types as combined value', (WidgetTester tester) async {
+    testWidgets('DS-1.7: Works with Dart 3 record types as combined value',
+        (WidgetTester tester) async {
       final state1 = dripState('A');
       final state2 = dripState('B');
 
@@ -174,7 +181,9 @@ void main() {
       expect(find.text('AB'), findsOneWidget);
     });
 
-    testWidgets('DS-1.8: Custom Equality prevents rebuild for custom equal records', (WidgetTester tester) async {
+    testWidgets(
+        'DS-1.8: Custom Equality prevents rebuild for custom equal records',
+        (WidgetTester tester) async {
       final state1 = dripState('a');
       int buildCount = 0;
 
@@ -183,7 +192,8 @@ void main() {
           textDirection: TextDirection.ltr,
           child: DripSelect<String>(
             select: () => state1.value,
-            equality: CustomEquality((a, b) => a.toLowerCase() == b.toLowerCase()),
+            equality:
+                CustomEquality((a, b) => a.toLowerCase() == b.toLowerCase()),
             builder: (context, value) {
               buildCount++;
               return Text(value);

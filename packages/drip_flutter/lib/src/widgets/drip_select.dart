@@ -36,10 +36,10 @@ class _DripSelectState<T> extends State<DripSelect<T>> implements DripListener {
   @override
   void onStateChanged() {
     if (!mounted) return;
-    
+
     // Evaluate the computed value lazily.
     final newValue = _computed.value;
-    
+
     // Check equality to prevent spurious rebuilds.
     final eq = widget.equality ?? defaultEquality<T>();
     if (!eq.equals(_currentValue, newValue)) {
@@ -52,10 +52,11 @@ class _DripSelectState<T> extends State<DripSelect<T>> implements DripListener {
   @override
   void didUpdateWidget(DripSelect<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.select != widget.select || oldWidget.equality != widget.equality) {
+    if (oldWidget.select != widget.select ||
+        oldWidget.equality != widget.equality) {
       _computed.unsubscribe(this);
       _computed.dispose();
-      
+
       _computed = DripComputed<T>(widget.select);
       _currentValue = _computed.value;
       _computed.subscribe(this);

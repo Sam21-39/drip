@@ -6,7 +6,8 @@ import 'package:drip_flutter/drip_flutter.dart';
 
 void main() {
   group('DripAsyncBuilder', () {
-    testWidgets('DAB-1.1 & DAB-1.2: Shows loading widget', (WidgetTester tester) async {
+    testWidgets('DAB-1.1 & DAB-1.2: Shows loading widget',
+        (WidgetTester tester) async {
       final state = DripAsync<String>(); // Starts as DripLoading
 
       await tester.pumpWidget(
@@ -40,7 +41,8 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
-    testWidgets('DAB-1.4 & DAB-1.5: Shows error widget', (WidgetTester tester) async {
+    testWidgets('DAB-1.4 & DAB-1.5: Shows error widget',
+        (WidgetTester tester) async {
       final state = DripAsync<String>();
       state.setError(Exception('failed'), StackTrace.empty);
 
@@ -57,7 +59,8 @@ void main() {
       expect(find.text('Exception: failed'), findsOneWidget);
     });
 
-    testWidgets('DAB-1.6: Loading widget receives previousData', (WidgetTester tester) async {
+    testWidgets('DAB-1.6: Loading widget receives previousData',
+        (WidgetTester tester) async {
       final state = DripAsync<String>();
       state.setData('old data');
       state.setLoading();
@@ -76,7 +79,8 @@ void main() {
       expect(find.text('Loading... prev: old data'), findsOneWidget);
     });
 
-    testWidgets('DAB-1.7: Error widget receives previousData', (WidgetTester tester) async {
+    testWidgets('DAB-1.7: Error widget receives previousData',
+        (WidgetTester tester) async {
       final state = DripAsync<String>();
       state.setData('old data');
       state.setError(Exception('failed'), StackTrace.empty);
@@ -95,7 +99,8 @@ void main() {
       expect(find.text('Error... prev: old data'), findsOneWidget);
     });
 
-    testWidgets('DAB-1.8: Refresh: DripData -> DripLoading -> DripData', (WidgetTester tester) async {
+    testWidgets('DAB-1.8: Refresh: DripData -> DripLoading -> DripData',
+        (WidgetTester tester) async {
       final state = DripAsync<String>();
       state.setData('1');
 
@@ -121,7 +126,8 @@ void main() {
       expect(find.text('Data: 2'), findsOneWidget);
     });
 
-    testWidgets('DAB-1.9: Listener deregistered on unmount', (WidgetTester tester) async {
+    testWidgets('DAB-1.9: Listener deregistered on unmount',
+        (WidgetTester tester) async {
       final state = DripAsync<String>();
 
       await tester.pumpWidget(
@@ -141,7 +147,8 @@ void main() {
       expect(state.subscribers.length, 0);
     });
 
-    testWidgets('DAB-1.10: didUpdateWidget switches to different DripAsync', (WidgetTester tester) async {
+    testWidgets('DAB-1.10: didUpdateWidget switches to different DripAsync',
+        (WidgetTester tester) async {
       final state1 = DripAsync<String>()..setData('1');
       final state2 = DripAsync<String>()..setData('2');
 
@@ -166,7 +173,9 @@ void main() {
       expect(state2.subscribers.length, 1);
     });
 
-    testWidgets('DAB-1.11: Builder does not rebuild when sibling DripAsync changes', (WidgetTester tester) async {
+    testWidgets(
+        'DAB-1.11: Builder does not rebuild when sibling DripAsync changes',
+        (WidgetTester tester) async {
       final state1 = DripAsync<String>()..setData('1');
       final state2 = DripAsync<String>()..setData('2');
       int buildCount1 = 0;
