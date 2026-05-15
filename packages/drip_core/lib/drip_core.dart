@@ -1,10 +1,10 @@
-export 'src/effect/drip_effect.dart';
-export 'src/equality/equality.dart';
 export 'src/async/drip_async.dart';
 export 'src/async/drip_async_value.dart';
+export 'src/batch/drip_batch.dart' show DripBatch;
+export 'src/effect/drip_effect.dart';
+export 'src/equality/equality.dart';
 export 'src/errors/drip_errors.dart';
+export 'src/readable/drip_readable.dart';
 export 'src/scope/drip_scope.dart';
 export 'src/state/drip_computed.dart';
-export 'src/readable/drip_readable.dart';
-export 'src/state/drip_state_base.dart' show DripListener;
 export 'src/state/drip_state.dart' show DripState, dripState;

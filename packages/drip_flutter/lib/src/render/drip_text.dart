@@ -29,7 +29,7 @@ class DripRenderParagraph extends RenderParagraph {
   void bindState(DripReadable<String> state, TextStyle style) {
     _binding?.dispose();
     _binding = DripBinding<String>(
-      state: state,
+      source: state,
       apply: (value) {
         // Construct a new TextSpan and assign it to the text property.
         // RenderParagraph.text setter internally handles Painter updates.

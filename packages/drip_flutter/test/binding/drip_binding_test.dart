@@ -9,7 +9,7 @@ void main() {
       String? appliedValue;
 
       DripBinding<String>(
-        state: state,
+        source: state,
         apply: (value) => appliedValue = value,
         markNeeds: () {},
       );
@@ -24,7 +24,7 @@ void main() {
       var markNeedsCalled = false;
 
       DripBinding<String>(
-        state: state,
+        source: state,
         apply: (value) => appliedValue = value,
         markNeeds: () => markNeedsCalled = true,
       );
@@ -44,7 +44,7 @@ void main() {
       var applyCount = 0;
 
       final binding = DripBinding<String>(
-        state: state,
+        source: state,
         apply: (_) => applyCount++,
         markNeeds: () {},
       );
@@ -61,7 +61,7 @@ void main() {
       final state = dripState('initial');
 
       final binding = DripBinding<String>(
-        state: state,
+        source: state,
         apply: (_) {},
         markNeeds: () {},
       );
@@ -80,7 +80,7 @@ void main() {
       var oldApplyCount = 0;
 
       final oldBinding = DripBinding<String>(
-        state: state,
+        source: state,
         apply: (_) => oldApplyCount++,
         markNeeds: () {},
       );

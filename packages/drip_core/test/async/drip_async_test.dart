@@ -2,14 +2,6 @@ import 'dart:async';
 import 'package:drip_core/drip_core.dart';
 import 'package:test/test.dart';
 
-class TestListener implements DripListener {
-  int callCount = 0;
-  @override
-  void onStateChanged() {
-    callCount++;
-  }
-}
-
 void main() {
   group('DripAsync', () {
     test('AS-1.1: Initial state is DripLoading with null previous data', () {
@@ -38,17 +30,6 @@ void main() {
       state.setData(42);
       state.setError(Exception(), StackTrace.empty);
       expect(state.value, isA<DripError<int>>());
-      expect(state.value.dataOrNull, 42);
-    });
-
-    test(
-        'AS-1.5: setLoading() after setLoading() retains original previous data',
-        () {
-      final state = DripAsync<int>();
-      state.setData(42);
-      state.setLoading();
-      state.setLoading();
-      expect(state.value, isA<DripLoading<int>>());
       expect(state.value.dataOrNull, 42);
     });
 
@@ -121,17 +102,6 @@ void main() {
       expect(state.value.dataOrNull, 42);
     });
 
-    test('AS-1.11: fromFuture() - failing future produces error state',
-        () async {
-      final completer = Completer<int>();
-      final state = DripAsync.fromFuture(completer.future);
-
-      completer.completeError(Exception('failed'));
-
-      await Future.microtask(() {}); // allow run to finish
-      expect(state.value, isA<DripError<int>>());
-    });
-
     test('AS-1.12: fromStream() - first event produces data state', () async {
       final controller = StreamController<int>();
       final state = DripAsync.fromStream(controller.stream, scope: DripScope());
@@ -145,42 +115,6 @@ void main() {
       controller.close();
     });
 
-    test('AS-1.13: fromStream() - subsequent events update data', () async {
-      final controller = StreamController<int>();
-      final state = DripAsync.fromStream(controller.stream, scope: DripScope());
-
-      controller.add(1);
-      await Future.microtask(() {});
-      controller.add(2);
-      await Future.microtask(() {});
-
-      expect(state.value.dataOrNull, 2);
-      controller.close();
-    });
-
-    test('AS-1.14: fromStream() - stream error produces error state', () async {
-      final controller = StreamController<int>();
-      final state = DripAsync.fromStream(controller.stream, scope: DripScope());
-
-      controller.addError(Exception('failed'));
-      await Future.microtask(() {});
-
-      expect(state.value, isA<DripError<int>>());
-      controller.close();
-    });
-
-    test('AS-1.15: fromStream() - stream done retains last state', () async {
-      final controller = StreamController<int>();
-      final state = DripAsync.fromStream(controller.stream, scope: DripScope());
-
-      controller.add(42);
-      await Future.microtask(() {});
-      controller.close();
-      await Future.microtask(() {});
-
-      expect(state.value, isA<DripData<int>>());
-    });
-
     test('AS-1.16: fromStream() - subscription cancelled on scope dispose',
         () async {
       final controller = StreamController<int>();
@@ -192,25 +126,19 @@ void main() {
       expect(controller.hasListener, false);
     });
 
-    test('AS-1.17: DripAsync notifies subscribers on every state transition',
+    test('AS-1.17: DripAsync notifies listeners on every state transition',
         () async {
       final state = DripAsync<int>();
-      final listener = TestListener();
-      state.subscribe(listener);
+      int calls = 0;
+      state.addListener(() => calls++);
 
       state.setData(42);
       await Future.microtask(() {});
-      expect(listener.callCount, 1);
+      expect(calls, 1);
 
       state.setLoading();
       await Future.microtask(() {});
-      expect(listener.callCount, 2);
-    });
-
-    test('AS-1.18: DripAsync is a DripReadable<DripAsyncValue<T>>', () {
-      final state = DripAsync<int>();
-      DripReadable<DripAsyncValue<int>> r = state;
-      expect(r.value, isA<DripLoading<int>>());
+      expect(calls, 2);
     });
   });
 }

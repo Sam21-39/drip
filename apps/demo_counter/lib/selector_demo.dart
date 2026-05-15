@@ -35,10 +35,12 @@ class SelectorDemoScreen extends StatelessWidget {
               children: [
                 const Text('DripSelect (Rebuilds only when username or unread changes):'),
                 const SizedBox(height: 16),
-                DripSelect<(String, int)>(
-                  select: () => (node.username.value, node.unreadCount.value),
+                DripSelect2<String, int, (String, int)>(
+                  source1: node.username,
+                  source2: node.unreadCount,
+                  selector: (a, b) => (a, b),
                   builder: (context, value) {
-                    debugPrint('DripSelect rebuilt!');
+                    debugPrint('DripSelect2 rebuilt!');
                     return Card(
                       color: Colors.blue.shade50,
                       child: Padding(
@@ -53,7 +55,7 @@ class SelectorDemoScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 DripBuilder<int>(
-                  value: node.unrelatedState,
+                  source: node.unrelatedState,
                   builder: (context, value) {
                     return Text('Unrelated state (Rebuilds independently): $value');
                   },

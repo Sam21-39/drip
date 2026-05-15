@@ -21,6 +21,7 @@ export 'src/node/drip_node.dart';
 export 'src/node/drip_node_provider.dart';
 export 'src/node/drip_route_node.dart';
 export 'src/node/drip_node_context.dart';
+export 'src/node/drip_async_node_mixin.dart';
 
 // List system
 export 'src/list/drip_list.dart';
@@ -30,4 +31,3 @@ export 'src/list/drip_list_view.dart';
 export 'src/widgets/drip_builder.dart';
 export 'src/widgets/drip_select.dart';
 export 'src/widgets/drip_async_builder.dart';
-export 'src/node/drip_async_node.dart';

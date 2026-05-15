@@ -20,7 +20,7 @@ class InMemoryCounterRepository implements CounterRepository {
   }
 }
 
-class CounterNode extends DripNode with DripAsyncNode {
+class CounterNode extends DripNode with DripAsyncNodeMixin {
   late final DripState<int> count;
   late final DripComputed<String> displayText;
   late final DripComputed<double> opacity;
@@ -37,9 +37,9 @@ class CounterNode extends DripNode with DripAsyncNode {
     canDecrement = computed(() => count.value > 0);
 
     final repo = resolve<CounterRepository>() as InMemoryCounterRepository;
-    
+
     // Simulate fetching persisted count using asyncFromFuture
-    persistedCount = asyncFromFuture(() => repo.fetchPersistedCount());
+    persistedCount = DripAsync.fromFuture(repo.fetchPersistedCount());
 
     effect(() {
       repo.sync(count.value);

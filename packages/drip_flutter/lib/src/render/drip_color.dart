@@ -28,7 +28,7 @@ class DripColorRenderBox extends RenderProxyBox {
   void bindState(DripReadable<Color> state) {
     _binding?.dispose();
     _binding = DripBinding<Color>(
-      state: state,
+      source: state,
       apply: (value) => color = value,
       markNeeds: () {
         // Design Decision: markNeedsPaint() is sufficient for background color

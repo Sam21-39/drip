@@ -6,53 +6,69 @@ import 'package:drip_core/drip_core.dart';
 /// Use this when you need to conditionally build different widgets based on
 /// a reactive value. Unlike [DripFrameBuilder], which expects imperative
 /// updates, this builder automatically tracks and rebuilds when the bound
-/// [value] changes.
+/// [source] changes.
 class DripBuilder<T> extends StatefulWidget {
-  final DripReadable<T> value;
+  /// The reactive source to watch.
+  final DripReadable<T> source;
+
+  /// The builder function called whenever the source changes.
   final Widget Function(BuildContext context, T value) builder;
+
+  /// Optional equality function to skip rebuilds when the value is unchanged.
+  /// Defaults to `==` if not provided.
+  final bool Function(T a, T b)? identity;
 
   const DripBuilder({
     super.key,
-    required this.value,
+    required this.source,
     required this.builder,
+    this.identity,
   });
 
   @override
   State<DripBuilder<T>> createState() => _DripBuilderState<T>();
 }
 
-class _DripBuilderState<T> extends State<DripBuilder<T>>
-    implements DripListener {
+class _DripBuilderState<T> extends State<DripBuilder<T>> {
   late T _currentValue;
 
   @override
   void initState() {
     super.initState();
-    _currentValue = widget.value.value;
-    widget.value.subscribe(this);
+    _currentValue = widget.source.value;
+    widget.source.addListener(_onChanged);
   }
 
-  @override
-  void onStateChanged() {
+  void _onChanged() {
     if (!mounted) return;
+
+    final newValue = widget.source.value;
+    final isEqual = widget.identity?.call(_currentValue, newValue) ??
+        (_currentValue == newValue);
+
+    if (isEqual) return;
+
+    // DRIP EXCEPTION: setState() is permitted here.
+    // DripBuilder exists to confine structural rebuilds
+    // to the smallest possible subtree. This is intentional.
     setState(() {
-      _currentValue = widget.value.value;
+      _currentValue = newValue;
     });
   }
 
   @override
   void didUpdateWidget(DripBuilder<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.value != widget.value) {
-      oldWidget.value.unsubscribe(this);
-      _currentValue = widget.value.value;
-      widget.value.subscribe(this);
+    if (oldWidget.source != widget.source) {
+      oldWidget.source.removeListener(_onChanged);
+      _currentValue = widget.source.value;
+      widget.source.addListener(_onChanged);
     }
   }
 
   @override
   void dispose() {
-    widget.value.unsubscribe(this);
+    widget.source.removeListener(_onChanged);
     super.dispose();
   }
 

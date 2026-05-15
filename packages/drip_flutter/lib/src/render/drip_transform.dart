@@ -34,7 +34,7 @@ class DripTransformRenderBox extends RenderTransform {
   void bindState(DripReadable<Matrix4> state) {
     _binding?.dispose();
     _binding = DripBinding<Matrix4>(
-      state: state,
+      source: state,
       apply: (value) => transform = value,
       markNeeds: () {
         // Rationale: Transforms are typically paint-only. Hit-testing is

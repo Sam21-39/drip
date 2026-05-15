@@ -7,12 +7,12 @@ import '../binding/drip_binding.dart';
 /// allowing developers to create custom high-performance bindings without
 /// re-implementing the core lifecycle logic.
 abstract class DripCustomBinding<T> {
-  /// The reactive state source.
-  final DripReadable<T> state;
+  /// The reactive source.
+  final DripReadable<T> source;
   DripBinding<T>? _binding;
 
-  /// Creates a [DripCustomBinding] for the given [state].
-  DripCustomBinding(this.state);
+  /// Creates a [DripCustomBinding] for the given [source].
+  DripCustomBinding(this.source);
 
   /// Implement this to apply the new state value to the [RenderObject] property.
   void applyValue(T value);
@@ -27,7 +27,7 @@ abstract class DripCustomBinding<T> {
   void initBinding() {
     _binding?.dispose();
     _binding = DripBinding<T>(
-      state: state,
+      source: source,
       apply: applyValue,
       markNeeds: markNeedsMethod,
     );

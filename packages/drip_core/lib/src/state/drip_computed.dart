@@ -80,22 +80,11 @@ class DripComputed<T> extends DripStateBase
     }
   }
 
-  /// Disposes this computed by unsubscribing from all sources.
   void dispose() {
     for (final source in _sourcesAtLastEval.keys) {
       source.removeSubscriber(this);
     }
     _sourcesAtLastEval.clear();
     clearAllSubscribers();
-  }
-
-  @override
-  void subscribe(DripListener listener) {
-    addSubscriber(ListenerSubscriber(listener));
-  }
-
-  @override
-  void unsubscribe(DripListener listener) {
-    removeSubscriber(ListenerSubscriber(listener));
   }
 }

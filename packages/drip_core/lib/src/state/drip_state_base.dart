@@ -1,4 +1,5 @@
 import 'dart:collection';
+import '../readable/drip_readable.dart';
 
 /// The internal subscriber interface.
 abstract interface class Subscriber {
@@ -6,26 +7,20 @@ abstract interface class Subscriber {
   void markStale();
 }
 
-/// A public listener interface for external render-layer subscribers.
-abstract interface class DripListener {
-  /// Called when the bound state has changed.
-  void onStateChanged();
-}
-
-/// Internal adapter to bridge [DripListener] to the core [Subscriber] interface.
-class ListenerSubscriber implements Subscriber {
-  final DripListener listener;
-  ListenerSubscriber(this.listener);
+/// Internal adapter to bridge [VoidCallback] to the core [Subscriber] interface.
+class VoidCallbackSubscriber implements Subscriber {
+  final VoidCallback callback;
+  VoidCallbackSubscriber(this.callback);
 
   @override
-  void markStale() => listener.onStateChanged();
+  void markStale() => callback();
 
   @override
   bool operator ==(Object other) =>
-      other is ListenerSubscriber && other.listener == listener;
+      other is VoidCallbackSubscriber && other.callback == callback;
 
   @override
-  int get hashCode => listener.hashCode;
+  int get hashCode => callback.hashCode;
 }
 
 /// The abstract base class for all reactive nodes in the DRIP graph.
@@ -45,6 +40,16 @@ abstract class DripStateBase {
   /// Removes a subscriber from this state.
   void removeSubscriber(Subscriber subscriber) {
     subscribers.remove(subscriber);
+  }
+
+  /// Registers a listener via the public [DripReadable] interface.
+  void addListener(VoidCallback listener) {
+    addSubscriber(VoidCallbackSubscriber(listener));
+  }
+
+  /// Removes a listener via the public [DripReadable] interface.
+  void removeListener(VoidCallback listener) {
+    removeSubscriber(VoidCallbackSubscriber(listener));
   }
 
   /// Clears all subscribers. Used during disposal.

@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:drip_core/drip_core.dart';
 import '../list/drip_list.dart';
 
@@ -9,6 +10,10 @@ import '../list/drip_list.dart';
 /// the node is disposed.
 abstract class DripNode {
   late final DripScope _scope;
+
+  /// The internal scope for this node.
+  @protected
+  DripScope get scope => _scope;
 
   final Map<Type, Object? Function()> _factories = {};
   final Map<Type, Object?> _singletons = {};

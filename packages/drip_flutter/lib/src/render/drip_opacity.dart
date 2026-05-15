@@ -33,7 +33,7 @@ class DripOpacityRenderBox extends RenderProxyBox {
   void bindState(DripReadable<double> state) {
     _binding?.dispose();
     _binding = DripBinding<double>(
-      state: state,
+      source: state,
       apply: (value) => opacity = value,
       markNeeds: () {
         // Rationale: Opacity is a paint-only property and does not affect layout.

@@ -75,7 +75,7 @@ class DripImageRenderBox extends RenderBox {
   void bindState(DripReadable<ImageProvider> state) {
     _binding?.dispose();
     _binding = DripBinding<ImageProvider>(
-      state: state,
+      source: state,
       apply: (value) {
         _imageProvider = value;
         _resolveImage();

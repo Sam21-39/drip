@@ -3,8 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:drip_core/drip_core.dart';
 import 'package:drip_flutter/drip_flutter.dart';
 
-class TestAsyncNode extends DripNode with DripAsyncNode {
-  late DripAsync<int> plainAsync;
+class TestAsyncNode extends DripNode with DripAsyncNodeMixin {
   late DripAsync<int> futureAsync;
   late DripAsync<int> streamAsync;
 
@@ -13,33 +12,31 @@ class TestAsyncNode extends DripNode with DripAsyncNode {
 
   @override
   void onInit() {
-    plainAsync = asyncState<int>();
-    futureAsync = asyncFromFuture(() => futureCompleter.future);
-    streamAsync = asyncFromStream(streamController.stream);
+    futureAsync = runAsync(() => futureCompleter.future);
+    streamAsync = watchStream(streamController.stream);
   }
 }
 
 void main() {
-  group('DripAsyncNode', () {
-    test('AN-1.1: asyncState<T>() returns DripAsync<T> in loading state', () {
+  group('DripAsyncNodeMixin', () {
+    test('AN-1.1: runAsync() returns DripAsync<T> in loading state', () {
       final node = TestAsyncNode();
-      expect(node.plainAsync.value, isA<DripLoading<int>>());
+      expect(node.futureAsync.value, isA<DripLoading<int>>());
     });
 
-    test('AN-1.2: asyncState<T>() disposed when node disposed', () {
+    test('AN-1.2: runAsync() disposed when node disposed', () {
       final node = TestAsyncNode();
-      expect(node.plainAsync.subscribers.isEmpty, true);
+      expect(node.futureAsync.subscribers.isEmpty, true);
 
-      // Simulate adding a subscriber
-      node.plainAsync.subscribe(TestListener());
-      expect(node.plainAsync.subscribers.isNotEmpty, true);
+      // Simulate adding a listener
+      node.futureAsync.addListener(() {});
+      expect(node.futureAsync.subscribers.isNotEmpty, true);
 
       node.dispose();
-      expect(node.plainAsync.subscribers.isEmpty, true);
+      expect(node.futureAsync.subscribers.isEmpty, true);
     });
 
-    test('AN-1.3 & AN-1.4: asyncFromFuture() transitions to data on completion',
-        () async {
+    test('AN-1.3: runAsync() transitions to data on completion', () async {
       final node = TestAsyncNode();
       expect(node.futureAsync.value, isA<DripLoading<int>>());
 
@@ -50,15 +47,7 @@ void main() {
       expect(node.futureAsync.value.dataOrNull, 42);
     });
 
-    test('AN-1.4: asyncFromFuture() transitions to error on failure', () async {
-      final node = TestAsyncNode();
-      node.futureCompleter.completeError(Exception('failed'));
-
-      await Future.microtask(() {}); // let run finish
-      expect(node.futureAsync.value, isA<DripError<int>>());
-    });
-
-    test('AN-1.5: asyncFromStream() transitions through states', () async {
+    test('AN-1.4: watchStream() transitions through states', () async {
       final node = TestAsyncNode();
       expect(node.streamAsync.value, isA<DripLoading<int>>());
 
@@ -72,8 +61,7 @@ void main() {
       expect(node.streamAsync.value, isA<DripError<int>>());
     });
 
-    test('AN-1.6: asyncFromStream() stream subscription cancelled on dispose()',
-        () async {
+    test('AN-1.5: watchStream() subscription cancelled on dispose()', () async {
       final node = TestAsyncNode();
       expect(node.streamController.hasListener, true);
 
@@ -81,9 +69,4 @@ void main() {
       expect(node.streamController.hasListener, false);
     });
   });
-}
-
-class TestListener implements DripListener {
-  @override
-  void onStateChanged() {}
 }

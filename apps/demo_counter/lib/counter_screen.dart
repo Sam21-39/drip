@@ -46,7 +46,7 @@ class CounterScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 DripAsyncBuilder<int>(
-                  state: node.persistedCount,
+                  source: node.persistedCount,
                   loading: (context, _) => const Text('Loading saved count...'),
                   data: (context, value) => Card(
                     child: Padding(

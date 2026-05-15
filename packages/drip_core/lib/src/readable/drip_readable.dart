@@ -1,4 +1,5 @@
-import '../state/drip_state_base.dart' show DripListener;
+/// A callback that takes no arguments and returns no value.
+typedef VoidCallback = void Function();
 
 /// The common interface for all readable reactive values.
 abstract interface class DripReadable<T> {
@@ -6,8 +7,8 @@ abstract interface class DripReadable<T> {
   T get value;
 
   /// Registers a listener to be notified when the value changes.
-  void subscribe(DripListener listener);
+  void addListener(VoidCallback listener);
 
   /// Deregisters a previously registered listener.
-  void unsubscribe(DripListener listener);
+  void removeListener(VoidCallback listener);
 }

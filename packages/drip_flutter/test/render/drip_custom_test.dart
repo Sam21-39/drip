@@ -7,7 +7,7 @@ import 'package:drip_flutter/src/render/drip_custom.dart';
 class _CustomOpacityBinding extends DripCustomBinding<double> {
   final RenderOpacity renderObject;
 
-  _CustomOpacityBinding(super.state, this.renderObject);
+  _CustomOpacityBinding(super.source, this.renderObject);
 
   @override
   void applyValue(double value) {

@@ -32,16 +32,6 @@ class DripState<T> extends DripStateBase implements DripReadable<T> {
     DripBatch.instance.schedulePropagate(propagate);
   }
 
-  @override
-  void subscribe(DripListener listener) {
-    addSubscriber(ListenerSubscriber(listener));
-  }
-
-  @override
-  void unsubscribe(DripListener listener) {
-    removeSubscriber(ListenerSubscriber(listener));
-  }
-
   void propagate() {
     // Iterate over a snapshot to avoid concurrent modification during notification.
     final subscribersSnapshot = List<Subscriber>.from(subscribers);
