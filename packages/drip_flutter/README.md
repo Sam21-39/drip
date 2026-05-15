@@ -14,7 +14,8 @@ Provides direct `RenderObject` bindings that update the UI with **zero widget re
 ## Features
 
 - **Zero Rebuilds** — State changes call `markNeedsPaint()` / `markNeedsLayout()` directly on `RenderObject`s, bypassing the Widget → Element → RenderObject traversal entirely.
-- **`DripValue<T>` binding** — All render widgets accept both `DripState<T>` and `DripComputed<T>` via the shared `DripValue<T>` interface.
+- **Reactive Builder Widgets** — Scoped, optimized builders (`DripBuilder`, `DripSelect`, `DripAsyncBuilder`) for complex UI updates when rebuilding widgets is necessary.
+- **`DripReadable<T>` binding** — All render widgets accept both `DripState<T>` and `DripComputed<T>` via the shared `DripReadable<T>` interface.
 - **`DripNode` architecture** — Scoped, injectable, lifecycle-aware business logic modules.
 - **`DripList` granularity** — Updating item `i` in a 10,000-item list rebuilds exactly **1** tile.
 
@@ -30,6 +31,16 @@ Provides direct `RenderObject` bindings that update the UI with **zero widget re
 | `DripTransform` | `DripValue<Matrix4>` | `markNeedsPaint()` |
 | `DripImage` | `DripValue<ImageProvider>` | async image resolution |
 | `DripCustomBinding<T>` | any | developer-defined |
+
+## Builder Widgets
+
+When you need to rebuild a subtree conditionally or construct new widgets, use DRIP's reactive builders:
+
+| Widget | Purpose |
+|---|---|
+| `DripBuilder<T>` | Rebuilds its subtree whenever the bound `DripReadable<T>` changes. |
+| `DripSelect` | Combines multiple sources via an internal `DripComputed` and rebuilds only when the evaluated combination changes. |
+| `DripAsyncBuilder<T>`| Handles exhaustive sealed-class state rendering for `DripAsync<T>` (`loading`, `data`, `error`), automatically passing `previousData` to handlers. |
 
 ---
 
@@ -158,7 +169,7 @@ Open **Flutter DevTools → Performance → Track Widget Builds**: 1,000 `DripTe
 
 ```yaml
 dependencies:
-  drip_flutter: ^0.3.0-alpha
+  drip_flutter: ^0.4.0-alpha
 ```
 
 Requires Flutter `>=3.27.0`.

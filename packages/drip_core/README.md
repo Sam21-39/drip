@@ -27,9 +27,11 @@ DRIP Core is the zero-dependency state engine powering the DRIP framework. It pr
 |---|---|
 | `DripState<T>` | The source of truth. Holds a typed value and a version clock. |
 | `DripComputed<T>` | Lazily evaluated, cached derivation. Recomputes only when dependencies change. |
+| `DripAsync<T>` | Reactive async state container. Manages transitions between loading, data, and error states with concurrent call cancellation. |
+| `DripAsyncValue<T>` | Sealed class (`DripLoading`, `DripData`, `DripError`) providing exhaustive state mapping and `previousData` preservation. |
 | `DripEffect` | Automatic side-effect. Runs once on creation, re-runs on dependency change. |
 | `DripScope` | Resource owner. Disposes registered nodes in LIFO order. |
-| `DripValue<T>` | Shared interface — implemented by both `DripState` and `DripComputed`. Use as parameter type when you accept either. |
+| `DripReadable<T>` | Shared read/subscribe interface implemented by `DripState`, `DripComputed`, and `DripAsync`. |
 
 ---
 
@@ -79,18 +81,20 @@ scope.effect(() => print('Hello, ${name.value}'));
 scope.dispose(); // disposes name and the effect in LIFO order
 ```
 
-### Accepting both `DripState` and `DripComputed`
+### Accepting multiple sources via `DripReadable`
 
 ```dart
-void display(DripValue<String> source) {
+void display(DripReadable<String> source) {
   print(source.value);
 }
 
 final raw = dripState('hello');
 final upper = DripComputed(() => raw.value.toUpperCase());
+final asyncStr = DripAsync<String>()..setData('async data');
 
-display(raw);   // ✅
-display(upper); // ✅
+display(raw);      // ✅
+display(upper);    // ✅
+// Note: asyncStr.value is a DripAsyncValue<String>, so you'd normally map it first
 ```
 
 ---
@@ -108,7 +112,7 @@ display(upper); // ✅
 
 ```yaml
 dependencies:
-  drip_core: ^0.1.1-alpha
+  drip_core: ^0.2.0-alpha
 ```
 
 ---
