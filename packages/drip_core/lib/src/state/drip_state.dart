@@ -1,10 +1,11 @@
 import '../batch/drip_batch.dart';
 import '../equality/equality.dart';
 import '../tracking/tracking_context.dart';
+import '../readable/drip_readable.dart';
 import 'drip_state_base.dart';
 
 /// An atomic reactive value with a version clock and equality checking.
-class DripState<T> extends DripStateBase implements DripValue<T> {
+class DripState<T> extends DripStateBase implements DripReadable<T> {
   T _value;
   final String? debugName;
   final Equality<T> _equality;

@@ -103,36 +103,30 @@ DripNodeProvider<CounterNode>(
 
 ## Setup (contributors)
 
-**Prerequisites:** [FVM](https://fvm.app/) + [Melos](https://melos.invertase.dev/)
+**Prerequisites:** [Melos](https://melos.invertase.dev/)
 
 ```bash
-# Install FVM if not already installed
-dart pub global activate fvm
-
-# Use the pinned Flutter version for this repo
-fvm install  # reads from .fvmrc → 3.27.0
-
-# Activate Melos via the FVM-pinned Dart
-fvm dart pub global activate melos
+# Install Melos
+dart pub global activate melos
 
 # Link all local packages
-fvm dart pub global run melos bootstrap
+dart pub global run melos bootstrap
 ```
 
 ### Common commands
 
 ```bash
 # Run all tests
-fvm dart pub global run melos test
+dart pub global run melos test
 
 # Static analysis (zero-tolerance)
-fvm dart pub global run melos analyze
+dart pub global run melos analyze
 
 # Format
-fvm dart pub global run melos format
+dart pub global run melos format
 
 # Publish dry-run
-fvm dart pub global run melos publish:dry
+dart pub global run melos publish:dry
 ```
 
 Or use the short aliases if `melos` is on your PATH:

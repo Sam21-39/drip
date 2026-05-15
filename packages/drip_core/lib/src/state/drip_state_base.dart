@@ -28,13 +28,6 @@ class ListenerSubscriber implements Subscriber {
   int get hashCode => listener.hashCode;
 }
 
-/// A readable reactive value that can be listened to.
-abstract interface class DripValue<T> {
-  T get value;
-  void subscribe(DripListener listener);
-  void unsubscribe(DripListener listener);
-}
-
 /// The abstract base class for all reactive nodes in the DRIP graph.
 abstract class DripStateBase {
   /// The version clock for this state. Starts at 0 and increments on mutation.

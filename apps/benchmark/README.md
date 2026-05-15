@@ -9,7 +9,7 @@ This benchmark measures the efficiency of different state management frameworks 
 To get accurate performance metrics, you **must** run the app in release mode on a physical device.
 
 ```bash
-fvm flutter run --release
+flutter run --release
 ```
 
 ## 📊 Key Metrics

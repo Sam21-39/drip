@@ -1,3 +1,30 @@
+## 0.2.0-alpha
+
+### Added
+- `DripReadable<T>` — common read + subscribe interface implemented by
+  `DripState<T>`, `DripComputed<T>`, and `DripAsync<T>`
+- `DripAsyncValue<T>` — sealed class with three variants:
+  - `DripLoading<T>` — carries optional `previousData` for refresh patterns
+  - `DripData<T>` — carries the successful result value
+  - `DripError<T>` — carries error, stackTrace, optional `previousData`
+  - Convenience: `isLoading`, `hasData`, `hasError`, `dataOrNull`,
+    `getDataOr()`, `map()`, `hasPreviousData`
+- `DripAsync<T>` — reactive async state container extending
+  `DripState<DripAsyncValue<T>>`
+  - `setLoading()` — transitions to loading, preserves previous data
+  - `setData(value)` — transitions to data
+  - `setError(error, stack)` — transitions to error, preserves previous data
+  - `run(computation)` — manages all three transitions automatically with
+    generation-counter concurrent-call cancellation guarantee
+  - `fromFuture()` — static factory
+  - `fromStream()` — static factory with scope-registered subscription
+
+### Changed
+- `DripState<T>` — now implements `DripReadable<T>`
+- `DripComputed<T>` — now implements `DripReadable<T>`
+
+---
+
 ## 0.1.1-alpha (2026-05-14)
 
 ### Added

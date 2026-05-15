@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import '../binding/drip_binding.dart';
 
-/// A [RenderParagraph] that supports direct [DripValue] binding.
+/// A [RenderParagraph] that supports direct [DripReadable] binding.
 class DripRenderParagraph extends RenderParagraph {
   /// Creates a [DripRenderParagraph].
   DripRenderParagraph(
@@ -23,10 +23,10 @@ class DripRenderParagraph extends RenderParagraph {
 
   DripBinding<String>? _binding;
 
-  /// Binds a [DripValue] to this render object.
+  /// Binds a [DripReadable] to this render object.
   ///
   /// Disposes any existing binding before creating a new one.
-  void bindState(DripValue<String> state, TextStyle style) {
+  void bindState(DripReadable<String> state, TextStyle style) {
     _binding?.dispose();
     _binding = DripBinding<String>(
       state: state,
@@ -68,13 +68,13 @@ class DripRenderParagraph extends RenderParagraph {
   }
 }
 
-/// A widget that renders text from a [DripValue<String>] with zero rebuilds.
+/// A widget that renders text from a [DripReadable<String>] with zero rebuilds.
 ///
 /// When the [state] changes, [DripText] updates the underlying [RenderParagraph]
 /// directly, bypassing the widget build cycle.
 class DripText extends LeafRenderObjectWidget {
   /// The reactive state source for the text content.
-  final DripValue<String> state;
+  final DripReadable<String> state;
 
   /// The style to use for the text.
   final TextStyle? style;

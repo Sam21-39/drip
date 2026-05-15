@@ -1,10 +1,11 @@
 import '../errors/drip_errors.dart';
 import '../tracking/tracking_context.dart';
+import '../readable/drip_readable.dart';
 import 'drip_state_base.dart';
 
 /// A lazily evaluated, cached derived reactive value.
 class DripComputed<T> extends DripStateBase
-    implements Subscriber, DripValue<T> {
+    implements Subscriber, DripReadable<T> {
   final T Function() _computation;
   final String? debugName;
 

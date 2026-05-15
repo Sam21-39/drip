@@ -44,6 +44,33 @@ class CounterScreen extends StatelessWidget {
                   onPressed: node.reset,
                   child: const Text('RESET'),
                 ),
+                const SizedBox(height: 32),
+                DripAsyncBuilder<int>(
+                  state: node.persistedCount,
+                  loading: (context, _) => const Text('Loading saved count...'),
+                  data: (context, value) => Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text('Saved count: $value',
+                          style: const TextStyle(fontSize: 18)),
+                    ),
+                  ),
+                  error: (context, error, _, __) => Column(
+                    children: [
+                      Text('Failed to load: $error',
+                          style: const TextStyle(color: Colors.red)),
+                      TextButton(
+                        onPressed: () {
+                          final repo = node.resolve<CounterRepository>()
+                              as InMemoryCounterRepository;
+                          node.persistedCount
+                              .run(() => repo.fetchPersistedCount());
+                        },
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

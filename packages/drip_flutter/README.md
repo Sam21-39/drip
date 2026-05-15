@@ -147,7 +147,7 @@ Run the `demo_grid` app in profile mode to observe the zero-rebuild guarantee:
 
 ```bash
 cd apps/demo_grid
-fvm flutter run --profile
+flutter run --profile
 ```
 
 Open **Flutter DevTools → Performance → Track Widget Builds**: 1,000 `DripText` cells update every 16 ms — widget build count stays at **0**.

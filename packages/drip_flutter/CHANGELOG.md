@@ -1,4 +1,24 @@
-## Unreleased
+## 0.4.0-alpha
+
+### Added
+- `DripBuilder<T>` — general-purpose reactive builder widget. Accepts any
+  `DripReadable<T>` (DripState, DripComputed, or DripAsync) and rebuilds
+  its subtree when the value changes. Scoped setState — only the builder's
+  own subtree rebuilds.
+- `DripSelect` — multi-source reactive builder. Uses an internal
+  `DripComputed` to combine multiple reactive sources. Rebuilds only when
+  the combined output changes (version-clock and equality checked).
+  Supports Dart 3 record types as combined value.
+- `DripAsyncBuilder<T>` — async state widget with exhaustive sealed-class
+  switching. Provides `loading`, `data`, and `error` builder callbacks.
+  Both `loading` and `error` receive `previousData` for continuity patterns.
+  Sensible defaults for unimplemented callbacks (debug warnings included).
+- `DripAsyncNode` mixin — adds `asyncState<T>()`, `asyncFromFuture()`, and
+  `asyncFromStream()` to `DripNode` subclasses. All async states are
+  automatically scoped to the node's `DripScope`.
+
+### Dependencies
+- `drip_core` constraint updated to `^0.2.0-alpha`
 
 ---
 

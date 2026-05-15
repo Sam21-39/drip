@@ -58,6 +58,11 @@ abstract class DripNode {
     return list;
   }
 
+  /// Registers a disposal callback bounded to this node's scope.
+  void registerDisposal(void Function() fn) {
+    _scope.registerDisposal(fn);
+  }
+
   /// Registers a dependency factory for type [T].
   ///
   /// If [singleton] is true (default), the factory is invoked once upon

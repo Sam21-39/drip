@@ -1,6 +1,6 @@
 import 'package:drip_core/drip_core.dart';
 
-/// A live connection between a [DripValue<T>] and a specific property on a [RenderObject].
+/// A live connection between a [DripReadable<T>] and a specific property on a [RenderObject].
 ///
 /// Implements [DripListener] to receive updates directly from the reactive core.
 ///
@@ -8,7 +8,7 @@ import 'package:drip_core/drip_core.dart';
 /// to maintain type safety and avoid closure overhead for every binding.
 class DripBinding<T> implements DripListener {
   /// The reactive source for this binding.
-  final DripValue<T> state;
+  final DripReadable<T> state;
 
   /// The closure to apply the new state value to the [RenderObject] property.
   final void Function(T value) apply;
