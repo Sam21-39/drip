@@ -3,6 +3,7 @@ import '../equality/equality.dart';
 import '../errors/drip_errors.dart';
 import '../tracking/tracking_context.dart';
 import '../readable/drip_readable.dart';
+import '../debug/drip_trace.dart';
 import 'drip_state_base.dart';
 
 /// An atomic reactive value with a version clock and equality checking.
@@ -15,7 +16,15 @@ class DripState<T> extends DripStateBase implements DripReadable<T> {
     this._value, {
     this.debugName,
     Equality<T>? equality,
-  }) : _equality = equality ?? defaultEquality<T>();
+  }) : _equality = equality ?? defaultEquality<T>() {
+    assert(() {
+      if (debugName == null) {
+        print(
+            'Drip Warning: DripState created without debugName. Set debugName for better stack traces.');
+      }
+      return true;
+    }());
+  }
 
   /// The current value of this state.
   /// Records a dependency if a [TrackingContext] is active.
@@ -53,6 +62,10 @@ class DripState<T> extends DripStateBase implements DripReadable<T> {
     }());
 
     if (_equality.equals(_value, newValue)) return;
+
+    if (DripTrace.isEnabled) {
+      DripTrace.setCurrent(StackTrace.current);
+    }
 
     _value = newValue;
     version++;

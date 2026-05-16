@@ -1,3 +1,15 @@
+## 0.5.1-alpha (2026-05-16)
+
+### Added
+- **`DripTrace`**: Diagnostic layer for capturing synchronous mutation context.
+- **`DripReadableX`**: Extensions `asString`, `map`, and `where` for reactive values.
+
+### Changed
+- `DripBatch`: Microtask flush now chains stack traces using `DripTrace` when available.
+- `DripState`/`DripComputed`: Constructors now assert presence of `debugName` for better trace diagnostics.
+
+---
+
 ## 0.5.0-alpha (2026-05-16)
 
 ### Fixed

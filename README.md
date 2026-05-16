@@ -15,8 +15,8 @@ Sub-widget reactive state for Flutter. State changes propagate directly to `Rend
 
 | Package | Version | Description |
 |---|---|---|
-| [`drip_core`](packages/drip_core) | `0.5.0-alpha` | Pure Dart reactive engine — `DripState`, `DripComputed`, `DripEffect`, `DripScope` |
-| [`drip_flutter`](packages/drip_flutter) | `0.5.0-alpha` | Flutter render layer — `DripText`, `DripOpacity`, `DripNode`, `DripList` |
+| [`drip_core`](packages/drip_core) | `0.5.1-alpha` | Pure Dart reactive engine — `DripState`, `DripComputed`, `DripEffect`, `DripScope`, `DripTrace` |
+| [`drip_flutter`](packages/drip_flutter) | `0.5.1-alpha` | Flutter render layer — `DripText`, `DripOpacity`, `DripLifecycle`, `DripSemantics` |
 | `drip_core_native` | planned | FFI shared memory native bridge |
 | `drip_gen` | planned | Code generator + CLI |
 
@@ -78,12 +78,25 @@ class CounterNode extends DripNode {
   }
 }
 
-// In your widget tree:
-DripNodeProvider<CounterNode>(
+// In your widget tree (Context-Free Injection):
+DripLifecycle<CounterNode>(
   create: () => CounterNode(),
-  builder: (context, node) => DripText(node.displayText),
+  child: DripBuilder<CounterNode>(
+    builder: (context, node) => DripText(node.displayText),
+  ),
 )
 ```
+
+### 4. Diagnostic Tooling (`DripTrace`)
+
+```dart
+// Enable synchronous stack trace capturing for state mutations
+DripTrace.enabled = true;
+
+final count = dripState(0, debugName: 'counter');
+// If an effect fails, the stack trace will chain back to the exact write call.
+```
+
 
 ---
 
@@ -95,7 +108,7 @@ DripNodeProvider<CounterNode>(
 | `v0.2.0-alpha` | ✅ Released | Flutter render layer — `DripText`, `DripOpacity`, `DripColor`, `DripTransform`, `DripImage` |
 | `v0.3.0-alpha` | ✅ Released | Node architecture — `DripNode`, `DripNodeProvider`, `DripRouteNode`, `DripList`, `DripListView` |
 | `v0.4.0-alpha` | ✅ Released | Async layer — `DripAsync`, `DripAsyncValue`, `DripAsyncBuilder`, `DripSelect`, `DripAsyncNode` |
-| `v0.5.0-alpha` | ✅ Released | Stability — subscription lifecycle fix, test timing contracts, zero-warning static analysis |
+| `v0.5.1-alpha` | ✅ Released | Phase 5: Stability — Diagnostic tracing, Semantics bridge, Lifecycle widgets, Context-free enforcement |
 | `v0.6.0-alpha` | 🔜 Next | Native bridge — FFI shared memory (Android + iOS) |
 | `v1.0.0-beta` | Planned | Code generation + CLI + Router integration |
 | `v1.0.0` | Planned | Stable |

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import '../debug/drip_trace.dart';
 import 'drip_scheduler_config.dart';
 
 /// Signature for a post-frame callback registrar.
@@ -111,7 +112,26 @@ class DripBatch {
     final effectsSnapshot = List<void Function()>.from(_effects);
     _effects.clear();
     for (final fn in effectsSnapshot) {
-      fn();
+      try {
+        fn();
+      } catch (e, stackTrace) {
+        if (DripTrace.isEnabled && DripTrace.current != null) {
+          Error.throwWithStackTrace(
+            e,
+            StackTrace.fromString(
+              '${stackTrace.toString()}\n'
+              '--- DripBatch microtask gap ---\n'
+              '${DripTrace.current.toString()}',
+            ),
+          );
+        } else {
+          rethrow;
+        }
+      }
+    }
+
+    if (DripTrace.isEnabled) {
+      DripTrace.setCurrent(null);
     }
   }
 

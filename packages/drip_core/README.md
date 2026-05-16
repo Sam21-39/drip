@@ -32,6 +32,7 @@ DRIP Core is the zero-dependency state engine powering the DRIP framework. It pr
 | `DripEffect` | Automatic side-effect. Runs once on creation, re-runs on dependency change. |
 | `DripScope` | Resource owner. Disposes registered nodes in LIFO order. |
 | `DripReadable<T>` | Shared read/subscribe interface implemented by `DripState`, `DripComputed`, and `DripAsync`. |
+| `DripTrace` | Debug-only diagnostic layer for capturing stack traces on state mutations. |
 
 ---
 
@@ -112,7 +113,7 @@ display(upper);    // ✅
 
 ```yaml
 dependencies:
-  drip_core: ^0.5.0-alpha
+  drip_core: ^0.5.1-alpha
 ```
 
 ---

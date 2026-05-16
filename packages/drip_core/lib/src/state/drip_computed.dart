@@ -16,7 +16,15 @@ class DripComputed<T> extends DripStateBase
   /// Maps source states to the version they had during the last evaluation.
   final Map<DripStateBase, int> _sourcesAtLastEval = {};
 
-  DripComputed(this._computation, {this.debugName});
+  DripComputed(this._computation, {this.debugName}) {
+    assert(() {
+      if (debugName == null) {
+        print(
+            'Drip Warning: DripComputed created without debugName. Set debugName for better stack traces.');
+      }
+      return true;
+    }());
+  }
 
   /// Returns the current value, recomputing if any dependency has changed.
   T get value {

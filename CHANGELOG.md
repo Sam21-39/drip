@@ -1,3 +1,17 @@
+## 0.5.1-alpha (2026-05-16)
+
+### Added
+- **`DripTrace`**: Debug-only diagnostic layer that captures synchronous call context at state mutation and chains stack traces across `DripBatch` microtask boundaries.
+- **`DripSemantics`**: Accessibility bridge widget that synchronizes `DripReadable<T>` to the Flutter semantics tree with a configurable debounce (default 200ms).
+- **`DripLifecycle`**: Context-free widget for managing `DripNode` lifecycles without `InheritedWidget`.
+- **`DripScope.asWidget()`**: Helper method to bind a `DripScope`'s lifetime to the widget tree.
+- **`DripReadableX`**: Ergonomic extension methods `asString()`, `map()`, and `where()` on `DripReadable<T>`.
+
+### Deprecated
+- `DripNodeProvider`, `context.node()`, `DripRouteNode`, `DripList`, and `DripListView` are deprecated to comply with the context-free paradigm and stability standards.
+
+---
+
 ## 0.5.0-alpha (2026-05-16)
 
 ### Fixed — `drip_flutter`
