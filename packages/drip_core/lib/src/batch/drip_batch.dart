@@ -109,29 +109,31 @@ class DripBatch {
       fn();
     }
 
-    final effectsSnapshot = List<void Function()>.from(_effects);
-    _effects.clear();
-    for (final fn in effectsSnapshot) {
-      try {
-        fn();
-      } catch (e, stackTrace) {
-        if (DripTrace.isEnabled && DripTrace.current != null) {
-          Error.throwWithStackTrace(
-            e,
-            StackTrace.fromString(
-              '${stackTrace.toString()}\n'
-              '--- DripBatch microtask gap ---\n'
-              '${DripTrace.current.toString()}',
-            ),
-          );
-        } else {
-          rethrow;
+    try {
+      final effectsSnapshot = List<void Function()>.from(_effects);
+      _effects.clear();
+      for (final fn in effectsSnapshot) {
+        try {
+          fn();
+        } catch (e, stackTrace) {
+          if (DripTrace.isEnabled && DripTrace.current != null) {
+            Error.throwWithStackTrace(
+              e,
+              StackTrace.fromString(
+                '${stackTrace.toString()}\n'
+                '--- DripBatch microtask gap ---\n'
+                '${DripTrace.current.toString()}',
+              ),
+            );
+          } else {
+            rethrow;
+          }
         }
       }
-    }
-
-    if (DripTrace.isEnabled) {
-      DripTrace.setCurrent(null);
+    } finally {
+      if (DripTrace.isEnabled) {
+        DripTrace.setCurrent(null);
+      }
     }
   }
 
