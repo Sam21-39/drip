@@ -75,10 +75,10 @@ jobs:
       - name: Run tests with coverage
         run: melos run test:coverage --no-select
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          # Fail the step if upload fails so coverage gaps are never silently missed.
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
 
   # ─────────────────────────────────────────────
