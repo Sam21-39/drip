@@ -41,8 +41,6 @@ Future<void> main() async {
   final gapTimes = <int>[];
   var lastFlushTime = stopwatch.elapsedMilliseconds;
 
-  // Simulate a listener that tracks flush intervals (frame proxy).
-
   final sub = Stream.periodic(
     const Duration(microseconds: writeIntervalMicros),
     (i) => i,
