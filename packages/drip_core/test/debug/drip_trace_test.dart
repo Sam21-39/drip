@@ -28,23 +28,16 @@ void main() {
     await Future.microtask(() {});
     expect(effectRan, true);
 
+    state.write(1);
+
     // The flush should rethrow with chained stack trace
-    Object? capturedError;
-    StackTrace? capturedStack;
-    final completer = Completer<void>();
-
-    runZonedGuarded(() {
-      state.write(1);
-    }, (e, stack) {
-      capturedError = e;
-      capturedStack = stack;
-      completer.complete();
-    });
-
-    await completer.future;
-    expect(capturedError, isA<StateError>());
-    expect(
-        capturedStack.toString(), contains('--- DripBatch microtask gap ---'));
+    try {
+      DripBatch.instance.debugFlush();
+      fail('Should have thrown');
+    } catch (e, stack) {
+      expect(e, isA<StateError>());
+      expect(stack.toString(), contains('--- DripBatch microtask gap ---'));
+    }
 
     // Trace should be cleared after flush
     expect(DripTrace.current, isNull);

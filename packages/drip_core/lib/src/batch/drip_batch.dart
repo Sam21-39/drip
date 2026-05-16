@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:meta/meta.dart';
+
 import '../debug/drip_trace.dart';
 import 'drip_scheduler_config.dart';
 
@@ -136,6 +138,11 @@ class DripBatch {
       }
     }
   }
+
+  /// Forces a synchronous flush of all pending propagations and effects.
+  /// Used in tests to verify error handling without microtask timing issues.
+  @visibleForTesting
+  void debugFlush() => _flush();
 
   /// Resets internal state. Used in tests only.
   void reset() {
