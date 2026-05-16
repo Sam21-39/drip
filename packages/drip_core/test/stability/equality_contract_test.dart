@@ -133,7 +133,8 @@ void main() {
       expect(() => state.write('hello'), returnsNormally);
     });
 
-    test('EC-1.7: Writing a genuinely different value never triggers the check', () {
+    test('EC-1.7: Writing a genuinely different value never triggers the check',
+        () {
       // The assert only fires when _equality.equals(a, b) is TRUE.
       // When values differ, equality is false and the check is skipped.
       final state = dripState(MissingHashCode(1));

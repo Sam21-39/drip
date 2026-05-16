@@ -63,7 +63,8 @@ Future<void> main() async {
 
   final duration = stopwatch.elapsedMilliseconds;
   final writesPerSec = (totalWrites / (duration / 1000)).toStringAsFixed(0);
-  final maxGap = gapTimes.isEmpty ? 0 : gapTimes.reduce((a, b) => a > b ? a : b);
+  final maxGap =
+      gapTimes.isEmpty ? 0 : gapTimes.reduce((a, b) => a > b ? a : b);
 
   print('Writes:        $totalWrites');
   print('Listeners:     1');
