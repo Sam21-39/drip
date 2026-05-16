@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use_from_same_package
 import 'package:meta/meta.dart';
 import 'package:drip_core/drip_core.dart';
 import '../list/drip_list.dart';

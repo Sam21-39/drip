@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use_from_same_package
 import 'package:flutter/widgets.dart';
 import 'drip_node.dart';
 
@@ -29,6 +30,8 @@ class _DripNodeInheritedWidget<N extends DripNode> extends InheritedWidget {
 /// 2. Listens to app lifecycle events and forwards them to [DripNode.onBackground]
 ///    and [DripNode.onForeground].
 /// 3. Disposes the node when unmounted.
+@Deprecated(
+    'Use DripLifecycle widget instead. Scheduled for removal in 0.8.0-rc.')
 class DripNodeProvider<N extends DripNode> extends StatefulWidget {
   final N Function() create;
   final Widget Function(BuildContext context, N node) builder;

@@ -1,8 +1,10 @@
+// ignore_for_file: deprecated_member_use_from_same_package
 import 'package:flutter/widgets.dart';
 import 'drip_node.dart';
 import 'drip_node_provider.dart';
 
 /// A [DripNode] variant whose lifecycle is additionally bound to a navigation route.
+@Deprecated('Scheduled for post-1.0.0. Do not use.')
 abstract class DripRouteNode extends DripNode {
   DripRouteNode({super.debugName});
 
@@ -16,6 +18,7 @@ abstract class DripRouteNode extends DripNode {
 }
 
 /// A [DripNodeProvider] variant that binds a [DripRouteNode] to a [RouteObserver].
+@Deprecated('Scheduled for post-1.0.0. Do not use.')
 class DripRouteNodeProvider<N extends DripRouteNode>
     extends DripNodeProvider<N> {
   final RouteObserver<ModalRoute<dynamic>> routeObserver;

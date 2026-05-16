@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use_from_same_package
 import 'package:flutter/widgets.dart';
 import 'drip_list.dart';
 
@@ -9,6 +10,8 @@ import 'drip_list.dart';
 /// Structural changes (add/remove) trigger a minimal list-level rebuild to
 /// add or remove tiles. Content changes (list[i] = value) trigger a rebuild
 /// ONLY for the `_DripListTile` at index `i`.
+@Deprecated(
+    'Use ListView.builder + DripBuilder. Scheduled for removal in 0.8.0-rc.')
 class DripListView<T> extends StatefulWidget {
   final DripList<T> list;
   final Widget Function(BuildContext context, T item, int index) itemBuilder;

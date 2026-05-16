@@ -8,6 +8,8 @@ extension DripNodeContextExtension on BuildContext {
   ///
   /// This is equivalent to `DripNodeProvider.of<N>(this)`.
   /// Throws a [FlutterError] if no such node is found.
+  @Deprecated(
+      'Use constructor injection instead. Scheduled for removal in 0.8.0-rc.')
   N node<N extends DripNode>() {
     return DripNodeProvider.of<N>(this);
   }
@@ -16,6 +18,8 @@ extension DripNodeContextExtension on BuildContext {
   /// or returns null if no such node is found.
   ///
   /// Useful for optional feature nodes that may or may not be present.
+  @Deprecated(
+      'Use constructor injection instead. Scheduled for removal in 0.8.0-rc.')
   N? maybeNode<N extends DripNode>() {
     // We cannot use DripNodeProvider.of because it throws if not found.
     // Instead we do the InheritedWidget lookup directly but don't throw.

@@ -6,6 +6,8 @@ import 'dart:collection';
 /// `DripList<T>` maintains a separate set of listeners for each index.
 /// Updating the item at index `i` only notifies the listener for that index,
 /// enabling zero-rebuild granular updates in `DripListView`.
+@Deprecated(
+    'Use DripState<List<T>> + DripBuilder. Scheduled for removal in 0.8.0-rc.')
 class DripList<T> {
   final List<T> _items;
   final List<Set<void Function()>> _indexListeners;

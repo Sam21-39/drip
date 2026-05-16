@@ -1,6 +1,6 @@
 name: drip_flutter
 description: "Flutter render layer for DRIP — direct RenderObject binding with zero widget rebuilds."
-version: 0.5.0-alpha
+version: 0.5.1-alpha
 homepage: https://github.com/Sam21-39/drip
 repository: https://github.com/Sam21-39/drip
 
@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  drip_core: ^0.5.0-alpha
+  drip_core: ^0.5.1-alpha
   meta: ^1.15.0
 
 dev_dependencies:

@@ -16,8 +16,8 @@ Provides direct `RenderObject` bindings that update the UI with **zero widget re
 - **Zero Rebuilds** — State changes call `markNeedsPaint()` / `markNeedsLayout()` directly on `RenderObject`s, bypassing the Widget → Element → RenderObject traversal entirely.
 - **Reactive Builder Widgets** — Scoped, optimized builders (`DripBuilder`, `DripSelect`, `DripAsyncBuilder`) for complex UI updates when rebuilding widgets is necessary.
 - **`DripReadable<T>` binding** — All render widgets accept both `DripState<T>` and `DripComputed<T>` via the shared `DripReadable<T>` interface.
-- **`DripNode` architecture** — Scoped, injectable, lifecycle-aware business logic modules.
-- **`DripList` granularity** — Updating item `i` in a 10,000-item list rebuilds exactly **1** tile.
+- **`DripLifecycle` & `DripNode`** — Explicit, context-free management of business logic modules. No `InheritedWidget` magic.
+- **`DripSemantics`** — Full accessibility support with zero-rebuild reactivity.
 
 ---
 
@@ -84,63 +84,39 @@ class CounterNode extends DripNode {
 }
 ```
 
-Provide and consume:
+Provide and consume (Context-Free):
 
 ```dart
-DripNodeProvider<CounterNode>(
+// Explicit dependency injection via constructor
+DripLifecycle<CounterNode>(
   create: () => CounterNode(),
-  builder: (context, node) => Column(children: [
-    DripText(node.displayText),
-    DripOpacity(opacity: node.opacity, child: ElevatedButton(
-      onPressed: node.increment,
-      child: Icon(Icons.add),
-    )),
-  ]),
+  child: DripBuilder<CounterNode>(
+    builder: (context, node) => Column(children: [
+      DripText(node.displayText),
+      DripOpacity(opacity: node.opacity, child: ElevatedButton(
+        onPressed: node.increment,
+        child: Icon(Icons.add),
+      )),
+    ]),
+  ),
 )
-
-// From a descendant widget:
-final node = context.node<CounterNode>();
 ```
 
-### 3. High-performance reactive list
+### 3. Accessibility with `DripSemantics`
 
 ```dart
-final items = DripList<String>(['a', 'b', 'c']);
-
-DripListView<String>(
-  list: items,
-  tileBuilder: (context, index, item) => Text(item),
-)
-
-// Update one item — rebuilds exactly 1 tile:
-items[1] = 'B';
-
-// Structural changes — rebuilds the list frame only:
-items.add('d');
-```
-
-### 4. Route-scoped nodes
-
-```dart
-class ProfileNode extends DripRouteNode {
-  @override
-  void onRouteEnter() => fetchProfile();
-
-  @override
-  void onRouteLeave() => cancelRequests();
-}
-
-// Register route observer in your MaterialApp:
-final observer = DripRouteObserver();
-MaterialApp(navigatorObservers: [observer]);
-
-// Wrap route content:
-DripRouteNode.wrap<ProfileNode>(
-  observer: observer,
-  create: () => ProfileNode(),
-  builder: (context, node) => ProfileScreen(),
+DripSemantics<int>(
+  value: node.count,
+  label: (value) => "Current count is $value",
+  child: DripText(node.displayText),
 )
 ```
+
+
+### 4. Reactive Lists
+
+For lists, use standard `ListView.builder` combined with `DripBuilder` for item-level granularity, or use the legacy `DripList` (deprecated) for O(1) tile updates.
+
 
 ---
 
@@ -169,7 +145,7 @@ Open **Flutter DevTools → Performance → Track Widget Builds**: 1,000 `DripTe
 
 ```yaml
 dependencies:
-  drip_flutter: ^0.5.0-alpha
+  drip_flutter: ^0.5.1-alpha
 ```
 
 Requires Flutter `>=3.27.0`.

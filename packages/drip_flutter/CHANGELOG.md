@@ -1,3 +1,19 @@
+## 0.5.1-alpha (2026-05-16)
+
+### Added
+- **`DripSemantics`**: Accessibility bridge for `DripReadable<T>`. Synchronizes reactive values to the semantics tree with debounced updates.
+- **`DripLifecycle`**: High-level widget for managing `DripNode` or `DripScope` lifetimes without `InheritedWidget`. Enforces context-free injection.
+- **`DripScope.asWidget()`**: Extension to easily bind a scope's disposal to a widget's lifecycle.
+
+### Deprecated
+- `DripNodeProvider`, `context.node()`, `DripRouteNode`, `DripList`, and `DripListView` are now deprecated.
+- **Migration**: Use `DripLifecycle` for node management and `DripBuilder` for list updates.
+
+### Changed
+- `DripBinding`: Now integrates with `DripTrace` to provide diagnostic context on render property updates.
+
+---
+
 ## 0.5.0-alpha (2026-05-16)
 
 ### Fixed
