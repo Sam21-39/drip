@@ -30,27 +30,6 @@ class MissingHashCode {
   // hashCode deliberately NOT overridden → uses Object.hashCode (identity).
 }
 
-/// Hand-written class with an explicit hashCode mismatch bug.
-class BuggyHashCode {
-  final int id;
-  const BuggyHashCode(this.id);
-
-  @override
-  bool operator ==(Object other) => other is BuggyHashCode && other.id == id;
-
-  @override
-  int get hashCode => id * 31 + 7; // Different formula than equality key.
-}
-
-// A pair of BuggyHashCode instances that are == but have different hashCodes.
-BuggyHashCode _buggyA() => BuggyHashCode(1);
-BuggyHashCode _buggyB() {
-  // Override hashCode to a known different value for testing purposes.
-  // We can't easily make a real BuggyHashCode mismatch without a subclass.
-  // Instead we use a wrapper approach via MissingHashCode which uses identity.
-  throw UnimplementedError();
-}
-
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
