@@ -8,15 +8,14 @@ import '../binding/drip_binding.dart';
 class DripColorRenderBox extends RenderProxyBox {
   Color _color;
   DripBinding<Color>? _binding;
+  DripReadable<Color>? _source;
 
-  /// Creates a [DripColorRenderBox].
   DripColorRenderBox({
     required Color color,
     RenderBox? child,
   })  : _color = color,
         super(child);
 
-  /// The current background color.
   Color get color => _color;
   set color(Color value) {
     if (_color == value) return;
@@ -24,28 +23,44 @@ class DripColorRenderBox extends RenderProxyBox {
     markNeedsPaint();
   }
 
-  /// Binds a [DripReadable] to this render object.
-  void bindState(DripReadable<Color> state) {
-    _binding?.dispose();
+  /// Stores the source and (re)creates the binding if source changed.
+  /// On unchanged source, calls [reapply] only — no subscription churn (Risk 4).
+  void bindState(DripReadable<Color> source) {
+    if (_source != source) {
+      _binding?.dispose();
+      _binding = null;
+      _source = source;
+      if (attached) _createBinding();
+    } else {
+      // Risk 1: re-assert DRIP value after a parent rebuild.
+      _binding?.reapply();
+    }
+  }
+
+  void _createBinding() {
+    final source = _source;
+    if (source == null) return;
     _binding = DripBinding<Color>(
-      source: state,
+      source: source,
       apply: (value) => color = value,
       markNeeds: () {
-        // Design Decision: markNeedsPaint() is sufficient for background color
-        // changes. Transparency changes on a simple background do not affect
-        // the compositing bits of the render object itself, as it doesn't
-        // introduce a new layer. This matches Flutter's RenderColoredBox.
-        if (attached) {
-          markNeedsPaint();
-        }
+        if (attached) markNeedsPaint();
       },
     );
   }
 
-  /// Disposes the current binding and stops updates.
   void unbindState() {
     _binding?.dispose();
     _binding = null;
+    _source = null;
+  }
+
+  // ── RenderObject lifecycle ────────────────────────────────────────────────
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    _createBinding(); // Risk 4: binding created on mount, not on every rebuild.
   }
 
   @override
@@ -66,14 +81,19 @@ class DripColorRenderBox extends RenderProxyBox {
     unbindState();
     super.dispose();
   }
+
+  /// Risk 1 fix: re-asserts DRIP value after hot reload.
+  @override
+  void reassemble() {
+    super.reassemble();
+    _binding?.reapply();
+  }
 }
 
 /// A widget that applies a background color from a [DripReadable<Color>] with zero rebuilds.
 class DripColor extends SingleChildRenderObjectWidget {
-  /// The reactive state source for the background color.
   final DripReadable<Color> color;
 
-  /// Creates a [DripColor] widget.
   const DripColor({
     required this.color,
     super.child,
@@ -90,6 +110,7 @@ class DripColor extends SingleChildRenderObjectWidget {
   @override
   void updateRenderObject(
       BuildContext context, DripColorRenderBox renderObject) {
+    // Risk 1 + Risk 4: bindState re-asserts value without subscription churn.
     renderObject.bindState(color);
   }
 

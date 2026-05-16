@@ -5,22 +5,17 @@ import 'package:flutter/widgets.dart';
 import '../binding/drip_binding.dart';
 
 /// A [RenderProxyBox] that supports direct [DripReadable] binding for opacity.
-///
-/// **Design Decision:** Subclassing [RenderProxyBox] instead of [RenderOpacity]
-/// to maintain a clean, binding-focused implementation without being coupled
-/// to internal caching logic of the framework's default opacity renderer.
 class DripOpacityRenderBox extends RenderProxyBox {
   double _opacity;
   DripBinding<double>? _binding;
+  DripReadable<double>? _source;
 
-  /// Creates a [DripOpacityRenderBox].
   DripOpacityRenderBox({
     required double opacity,
     RenderBox? child,
   })  : _opacity = opacity.clamp(0.0, 1.0),
         super(child);
 
-  /// The current opacity value, clamped to [0.0, 1.0].
   double get opacity => _opacity;
   set opacity(double value) {
     final clamped = value.clamp(0.0, 1.0);
@@ -29,25 +24,41 @@ class DripOpacityRenderBox extends RenderProxyBox {
     markNeedsPaint();
   }
 
-  /// Binds a [DripReadable] to this render object.
-  void bindState(DripReadable<double> state) {
-    _binding?.dispose();
+  void bindState(DripReadable<double> source) {
+    if (_source != source) {
+      _binding?.dispose();
+      _binding = null;
+      _source = source;
+      if (attached) _createBinding();
+    } else {
+      _binding?.reapply(); // Risk 1: re-assert after parent rebuild.
+    }
+  }
+
+  void _createBinding() {
+    final source = _source;
+    if (source == null) return;
     _binding = DripBinding<double>(
-      source: state,
+      source: source,
       apply: (value) => opacity = value,
       markNeeds: () {
-        // Rationale: Opacity is a paint-only property and does not affect layout.
-        if (attached) {
-          markNeedsPaint();
-        }
+        if (attached) markNeedsPaint();
       },
     );
   }
 
-  /// Disposes the current binding and stops updates.
   void unbindState() {
     _binding?.dispose();
     _binding = null;
+    _source = null;
+  }
+
+  // ── RenderObject lifecycle ────────────────────────────────────────────────
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    _createBinding(); // Risk 4: stable subscription.
   }
 
   @override
@@ -59,7 +70,6 @@ class DripOpacityRenderBox extends RenderProxyBox {
       return;
     }
 
-    // Apply opacity using the PaintingContext.
     context.pushOpacity(
       offset,
       (_opacity * 255).round(),
@@ -72,14 +82,19 @@ class DripOpacityRenderBox extends RenderProxyBox {
     unbindState();
     super.dispose();
   }
+
+  /// Risk 1 fix: re-asserts DRIP value after hot reload.
+  @override
+  void reassemble() {
+    super.reassemble();
+    _binding?.reapply();
+  }
 }
 
 /// A widget that applies opacity from a [DripReadable<double>] with zero rebuilds.
 class DripOpacity extends SingleChildRenderObjectWidget {
-  /// The reactive state source for the opacity value.
   final DripReadable<double> opacity;
 
-  /// Creates a [DripOpacity] widget.
   const DripOpacity({
     required this.opacity,
     super.child,

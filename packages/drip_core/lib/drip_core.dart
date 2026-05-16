@@ -1,6 +1,7 @@
 export 'src/async/drip_async.dart';
 export 'src/async/drip_async_value.dart';
 export 'src/batch/drip_batch.dart' show DripBatch;
+export 'src/batch/drip_scheduler_config.dart';
 export 'src/effect/drip_effect.dart';
 export 'src/equality/equality.dart';
 export 'src/errors/drip_errors.dart';

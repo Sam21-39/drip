@@ -1,7 +1,9 @@
+import 'package:drip_flutter/drip_flutter.dart';
 import 'package:flutter/material.dart';
 import 'counter_screen.dart';
 
 void main() {
+  DripFlutterBinding.ensureInitialized();
   runApp(const DemoCounterApp());
 }
 

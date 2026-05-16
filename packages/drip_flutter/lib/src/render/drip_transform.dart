@@ -8,8 +8,8 @@ import '../binding/drip_binding.dart';
 class DripTransformRenderBox extends RenderTransform {
   DripBinding<Matrix4>? _binding;
   Matrix4 _transform;
+  DripReadable<Matrix4>? _source;
 
-  /// Creates a [DripTransformRenderBox].
   DripTransformRenderBox({
     required Matrix4 initialTransform,
     super.origin,
@@ -30,26 +30,41 @@ class DripTransformRenderBox extends RenderTransform {
     markNeedsPaint();
   }
 
-  /// Binds a [DripReadable] to this render object.
-  void bindState(DripReadable<Matrix4> state) {
-    _binding?.dispose();
+  void bindState(DripReadable<Matrix4> source) {
+    if (_source != source) {
+      _binding?.dispose();
+      _binding = null;
+      _source = source;
+      if (attached) _createBinding();
+    } else {
+      _binding?.reapply(); // Risk 1: re-assert after parent rebuild.
+    }
+  }
+
+  void _createBinding() {
+    final source = _source;
+    if (source == null) return;
     _binding = DripBinding<Matrix4>(
-      source: state,
+      source: source,
       apply: (value) => transform = value,
       markNeeds: () {
-        // Rationale: Transforms are typically paint-only. Hit-testing is
-        // updated during the paint pass in Flutter.
-        if (attached) {
-          markNeedsPaint();
-        }
+        if (attached) markNeedsPaint();
       },
     );
   }
 
-  /// Disposes the current binding and stops updates.
   void unbindState() {
     _binding?.dispose();
     _binding = null;
+    _source = null;
+  }
+
+  // ── RenderObject lifecycle ────────────────────────────────────────────────
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    _createBinding(); // Risk 4: stable subscription.
   }
 
   @override
@@ -57,26 +72,23 @@ class DripTransformRenderBox extends RenderTransform {
     unbindState();
     super.dispose();
   }
+
+  /// Risk 1 fix: re-asserts DRIP value after hot reload.
+  @override
+  void reassemble() {
+    super.reassemble();
+    _binding?.reapply();
+  }
 }
 
 /// A widget that applies a matrix transform from a [DripReadable<Matrix4>] with zero rebuilds.
 class DripTransform extends SingleChildRenderObjectWidget {
-  /// The reactive state source for the transformation matrix.
   final DripReadable<Matrix4> transform;
-
-  /// The origin of the transform.
   final Offset? origin;
-
-  /// The alignment of the transform.
   final AlignmentGeometry? alignment;
-
-  /// Whether to apply the transform to hit tests.
   final bool transformHitTests;
-
-  /// The filter quality to use when transforming.
   final FilterQuality? filterQuality;
 
-  /// Creates a [DripTransform] widget.
   const DripTransform({
     required this.transform,
     super.child,
@@ -113,6 +125,7 @@ class DripTransform extends SingleChildRenderObjectWidget {
       ..transformHitTests = transformHitTests
       ..filterQuality = filterQuality;
 
+    // Risk 1 + Risk 4: re-assert without subscription churn.
     renderObject.bindState(transform);
   }
 

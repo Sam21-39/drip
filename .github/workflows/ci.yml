@@ -19,8 +19,12 @@ jobs:
   analyze:
     name: Format & Analyze
     runs-on: ubuntu-latest
+    permissions:
+      contents: read        # least-privilege: read source only
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false   # never expose GITHUB_TOKEN to steps
 
       - name: Setup Flutter via FVM
         uses: subosito/flutter-action@v2
@@ -29,7 +33,9 @@ jobs:
           cache: true
 
       - name: Install Melos
-        run: dart pub global activate melos
+        # Pin to a specific version so supply-chain attacks cannot inject code
+        # via a compromised "latest" tag.
+        run: dart pub global activate melos 6.3.2
 
       - name: Bootstrap workspace
         run: melos bootstrap
@@ -47,8 +53,12 @@ jobs:
     name: Tests · Released Packages
     runs-on: ubuntu-latest
     needs: analyze
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Flutter via FVM
         uses: subosito/flutter-action@v2
@@ -57,7 +67,7 @@ jobs:
           cache: true
 
       - name: Install Melos
-        run: dart pub global activate melos
+        run: dart pub global activate melos 6.3.2
 
       - name: Bootstrap workspace
         run: melos bootstrap
@@ -67,6 +77,9 @@ jobs:
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
+        with:
+          # Fail the step if upload fails so coverage gaps are never silently missed.
+          fail_ci_if_error: true
 
   # ─────────────────────────────────────────────
   # Job 3: Publish dry-run (push only)
@@ -76,8 +89,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     if: github.event_name == 'push'
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Flutter via FVM
         uses: subosito/flutter-action@v2
@@ -86,7 +103,7 @@ jobs:
           cache: true
 
       - name: Install Melos
-        run: dart pub global activate melos
+        run: dart pub global activate melos 6.3.2
 
       - name: Bootstrap workspace
         run: melos bootstrap

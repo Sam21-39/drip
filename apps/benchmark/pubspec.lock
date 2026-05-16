@@ -63,14 +63,14 @@ packages:
       path: "../../packages/drip_core"
       relative: true
     source: path
-    version: "0.2.0-alpha"
+    version: "0.5.0-alpha"
   drip_flutter:
     dependency: "direct main"
     description:
       path: "../../packages/drip_flutter"
       relative: true
     source: path
-    version: "0.4.0-alpha"
+    version: "0.5.0-alpha"
   fake_async:
     dependency: transitive
     description:

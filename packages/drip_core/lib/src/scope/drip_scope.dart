@@ -50,20 +50,39 @@ class DripScope {
   }
 
   /// Disposes all registered resources in LIFO order.
+  ///
+  /// **Resilient disposal guarantee (Risk 5 fix):** Every disposable is
+  /// attempted regardless of whether an earlier one threw. All errors are
+  /// collected and re-thrown together as a [DripDisposalError] after the loop
+  /// completes. This ensures no resource is silently leaked due to a throw in
+  /// an unrelated disposable.
+  ///
+  /// Invariant 3: Safe to call multiple times — subsequent calls are no-ops.
   void dispose() {
     if (_isDisposed) return;
     _isDisposed = true;
 
-    // LIFO disposal.
+    final errors = <Object>[];
+    final stackTraces = <StackTrace>[];
+
+    // LIFO disposal — iterate reversed so the last-registered is first disposed.
     for (final fn in _disposals.reversed) {
       try {
         fn();
-      } catch (e) {
-        // Log error but continue with other disposals.
-        print('Error during DripScope disposal: $e');
+      } catch (e, st) {
+        errors.add(e);
+        stackTraces.add(st);
       }
     }
     _disposals.clear();
+
+    if (errors.isNotEmpty) {
+      throw DripDisposalError(
+        errors: errors,
+        stackTraces: stackTraces,
+        scopeDebugName: debugName,
+      );
+    }
   }
 
   void _assertActive() {

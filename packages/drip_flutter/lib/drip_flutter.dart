@@ -4,13 +4,16 @@
 /// zero-rebuild UI updates.
 library;
 
-// Render binding widgets
-export 'src/render/drip_color.dart' show DripColor;
+// Flutter binding init hook
+export 'src/binding/drip_flutter_binding.dart';
+
+export 'src/render/drip_color.dart' show DripColor, DripColorRenderBox;
 export 'src/render/drip_custom.dart' show DripCustomBinding;
 export 'src/render/drip_image.dart' show DripImage;
-export 'src/render/drip_opacity.dart' show DripOpacity;
-export 'src/render/drip_text.dart' show DripText;
-export 'src/render/drip_transform.dart' show DripTransform;
+export 'src/render/drip_opacity.dart' show DripOpacity, DripOpacityRenderBox;
+export 'src/render/drip_text.dart' show DripText, DripRenderParagraph;
+export 'src/render/drip_transform.dart'
+    show DripTransform, DripTransformRenderBox;
 
 // Structural rebuild tools
 export 'src/structural/drip_frame.dart' show DripFrame;

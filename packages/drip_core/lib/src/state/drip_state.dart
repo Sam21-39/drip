@@ -1,5 +1,6 @@
 import '../batch/drip_batch.dart';
 import '../equality/equality.dart';
+import '../errors/drip_errors.dart';
 import '../tracking/tracking_context.dart';
 import '../readable/drip_readable.dart';
 import 'drip_state_base.dart';
@@ -24,7 +25,33 @@ class DripState<T> extends DripStateBase implements DripReadable<T> {
   }
 
   /// Updates the value and schedules a propagation if the value has changed.
+  ///
+  /// **Equality contract assertion (Risk 3, debug mode only):**
+  /// If the current and new values are considered equal by this state's
+  /// equality function (`a == b` → true), their hash codes must also match.
+  /// A violation indicates that type [T] implements `==` without a consistent
+  /// `hashCode` override, which silently corrupts DRIP's deduplication logic.
+  ///
+  /// This check is performed via [assert] and is completely absent in release
+  /// builds — zero production overhead.
   void write(T newValue) {
+    // Debug-mode equality/hashCode contract check.
+    // Runs only when the values are declared equal — that is the only path
+    // where a hashCode mismatch can corrupt the graph.
+    assert(() {
+      final currentValue = _value;
+      if (_equality.equals(currentValue, newValue)) {
+        if (currentValue.hashCode != newValue.hashCode) {
+          throw DripEqualityViolationError(
+            valueType: T,
+            hashCodeA: currentValue.hashCode,
+            hashCodeB: newValue.hashCode,
+          );
+        }
+      }
+      return true;
+    }());
+
     if (_equality.equals(_value, newValue)) return;
 
     _value = newValue;
