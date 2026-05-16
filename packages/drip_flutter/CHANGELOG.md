@@ -1,4 +1,41 @@
+## 0.5.0-alpha (2026-05-16)
+
+### Fixed
+
+#### Subscription Lifecycle — `DripRenderParagraph` (Risk 4 / CI-1.2)
+- **Root cause**: `unbindState()` was the only teardown path and always set `_source = null`.
+  When Flutter reuses the same `RenderObject` instance after unmounting a widget
+  (same slot / same type), `RenderObject.attach()` fired on remount but `_createBinding()`
+  returned early because `_source` was `null` — no new subscription was registered.
+- **Fix**: Split teardown into two methods:
+  - `detachBinding()` — removes the `DripBinding` subscription **but preserves `_source`**,
+    so `attach()` can re-subscribe on remount. Called from `didUnmountRenderObject`.
+  - `unbindState()` — full teardown (clears both `_binding` and `_source`). Called only
+    when the source is replaced via `bindState()` or the `RenderObject` is permanently
+    disposed.
+
+#### Test Timing — `flutter_test` two-pump pattern
+- **Root cause**: `DripBatch` schedules propagation via `Future.microtask`. In
+  `flutter_test`'s `FakeAsync`, microtasks drain **after** the frame's build phase.
+  Calling `write()` → one `pump()` delivers the notification and calls `setState`, but
+  the resulting dirty build is not picked up until the **next** frame.
+- **Fix** (`callback_identity_test.dart` / `scratch_test.dart`): Changed all
+  write-then-assert sequences to use **two pumps** after a reactive write:
+  1. First pump: microtask drains → `_onChanged` fires → `setState` marks element dirty.
+  2. Second pump: Flutter builds the dirty element → widget remounts → `attach()` →
+     subscription re-registered → listener count correct.
+- Also added `await tester.pump()` before `pumpWidget()` in the unmount step so the
+  `write(false)` notification is committed before the tree is replaced.
+
+### Internal
+- Diagnostic `print` instrumentation added to `DripBuilder._onChanged`, `initState`, and
+  `dispose` to trace the Flutter element lifecycle — removed after root cause confirmed.
+- All 113 `drip_flutter` tests pass. Zero `dart analyze` warnings.
+
+---
+
 ## 0.4.0-alpha
+
 
 ### Added
 - `DripBuilder<T>` — general-purpose reactive builder widget. Accepts any

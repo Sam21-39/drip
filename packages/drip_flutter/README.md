@@ -169,7 +169,7 @@ Open **Flutter DevTools → Performance → Track Widget Builds**: 1,000 `DripTe
 
 ```yaml
 dependencies:
-  drip_flutter: ^0.4.0-alpha
+  drip_flutter: ^0.5.0-alpha
 ```
 
 Requires Flutter `>=3.27.0`.

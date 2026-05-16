@@ -15,8 +15,8 @@ Sub-widget reactive state for Flutter. State changes propagate directly to `Rend
 
 | Package | Version | Description |
 |---|---|---|
-| [`drip_core`](packages/drip_core) | `0.1.1-alpha` | Pure Dart reactive engine — `DripState`, `DripComputed`, `DripEffect`, `DripScope` |
-| [`drip_flutter`](packages/drip_flutter) | `0.3.0-alpha` | Flutter render layer — `DripText`, `DripOpacity`, `DripNode`, `DripList` |
+| [`drip_core`](packages/drip_core) | `0.5.0-alpha` | Pure Dart reactive engine — `DripState`, `DripComputed`, `DripEffect`, `DripScope` |
+| [`drip_flutter`](packages/drip_flutter) | `0.5.0-alpha` | Flutter render layer — `DripText`, `DripOpacity`, `DripNode`, `DripList` |
 | `drip_core_native` | planned | FFI shared memory native bridge |
 | `drip_gen` | planned | Code generator + CLI |
 
@@ -94,9 +94,10 @@ DripNodeProvider<CounterNode>(
 | `v0.1.1-alpha` | ✅ Released | Reactive engine — `DripState`, `DripComputed`, `DripEffect`, `DripScope` |
 | `v0.2.0-alpha` | ✅ Released | Flutter render layer — `DripText`, `DripOpacity`, `DripColor`, `DripTransform`, `DripImage` |
 | `v0.3.0-alpha` | ✅ Released | Node architecture — `DripNode`, `DripNodeProvider`, `DripRouteNode`, `DripList`, `DripListView` |
-| `v0.4.0-alpha` | 🔜 Next | Native bridge — FFI shared memory (Android + iOS) |
-| `v0.5.0-beta` | Planned | Code generation + CLI |
-| `v0.6.0-beta` | Planned | Router integration + DevTools |
+| `v0.4.0-alpha` | ✅ Released | Async layer — `DripAsync`, `DripAsyncValue`, `DripAsyncBuilder`, `DripSelect`, `DripAsyncNode` |
+| `v0.5.0-alpha` | ✅ Released | Stability — subscription lifecycle fix, test timing contracts, zero-warning static analysis |
+| `v0.6.0-alpha` | 🔜 Next | Native bridge — FFI shared memory (Android + iOS) |
+| `v1.0.0-beta` | Planned | Code generation + CLI + Router integration |
 | `v1.0.0` | Planned | Stable |
 
 ---

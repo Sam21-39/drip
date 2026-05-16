@@ -1,4 +1,24 @@
+## 0.5.0-alpha (2026-05-16)
+
+### Fixed — `drip_flutter`
+- **`DripRenderParagraph` remount subscription bug** (CI-1.2): Split `unbindState()` into
+  two methods — `detachBinding()` (preserves `_source` for remount) and `unbindState()`
+  (full teardown on source swap or final disposal). Fixes missing `addListener` call when
+  Flutter reuses the same `RenderObject` instance across unmount/remount cycles.
+- **`flutter_test` two-pump contract**: `DripBatch` delivers notifications via
+  `Future.microtask`, which drains *after* `flutter_test`'s build phase. Tests that write a
+  reactive value and immediately assert a widget rebuild now use two `await tester.pump()`
+  calls: the first drains the microtask and marks the element dirty; the second runs the
+  frame that rebuilds the widget.
+
+### Fixed — `drip_core`
+- **Benchmark dead code**: removed the never-assigned `Timer? flushTimer` variable and the
+  unreachable `?.cancel()` call from `scheduler_flood_benchmark.dart`.
+
+---
+
 ## 0.3.0-alpha (2026-05-15)
+
 
 ### Added — Node System (`drip_flutter`)
 - `DripNode`, `DripNodeProvider`, `DripRouteNode`, `DripList`, `DripListView`

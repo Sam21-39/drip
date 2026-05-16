@@ -112,7 +112,7 @@ display(upper);    // ✅
 
 ```yaml
 dependencies:
-  drip_core: ^0.2.0-alpha
+  drip_core: ^0.5.0-alpha
 ```
 
 ---

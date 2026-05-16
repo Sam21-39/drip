@@ -1,4 +1,18 @@
+## 0.5.0-alpha (2026-05-16)
+
+### Fixed
+- **Scheduler benchmark dead code** (`benchmark/scheduler_flood_benchmark.dart`): removed
+  the unused `Timer? flushTimer` variable and its always-null `?.cancel()` call, along
+  with the now-redundant `dart:async` import. Zero behaviour change — the timer was a
+  leftover stub from an earlier design.
+
+### Internal
+- Benchmark verified clean under `dart analyze` (zero hints, zero dead-code warnings).
+
+---
+
 ## 0.2.0-alpha
+
 
 ### Added
 - `DripReadable<T>` — common read + subscribe interface implemented by

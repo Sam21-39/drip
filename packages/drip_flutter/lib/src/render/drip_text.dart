@@ -5,8 +5,11 @@ import 'package:flutter/widgets.dart';
 import '../binding/drip_binding.dart';
 
 /// A [RenderParagraph] that supports direct [DripReadable] binding.
+///
+/// The [DripBinding] is created in [attach] and destroyed in [dispose],
+/// not in [bindState], so that the subscription survives parent rebuilds
+/// without being torn down and re-created (Risk 4 fix).
 class DripRenderParagraph extends RenderParagraph {
-  /// Creates a [DripRenderParagraph].
   DripRenderParagraph(
     super.text, {
     super.textAlign,
@@ -23,81 +26,113 @@ class DripRenderParagraph extends RenderParagraph {
 
   DripBinding<String>? _binding;
 
-  /// Binds a [DripReadable] to this render object.
+  // The source and style are stored so that attach() can (re)create the binding
+  // when the RenderObject is mounted, and reapply() can be called from the
+  // widget's updateRenderObject.
+  DripReadable<String>? _source;
+  TextStyle _style = const TextStyle();
+
+  /// Called from [DripText.createRenderObject] and [DripText.updateRenderObject].
+  /// Stores the source and style for use in [attach].
   ///
-  /// Disposes any existing binding before creating a new one.
-  void bindState(DripReadable<String> state, TextStyle style) {
-    _binding?.dispose();
+  /// If the source reference itself has changed (e.g., the widget was given a
+  /// new state object), dispose the old binding and create a fresh one.
+  void bindState(DripReadable<String> source, TextStyle style) {
+    _style = style;
+
+    if (_source != source) {
+      // Source changed — tear down old binding and re-attach to new source.
+      _binding?.dispose();
+      _binding = null;
+      _source = source;
+
+      if (attached) {
+        _createBinding();
+      }
+    } else {
+      // Same source — only re-assert the current value (Risk 4: no subscription churn).
+      _binding?.reapply();
+    }
+  }
+
+  void _createBinding() {
+    final source = _source;
+    if (source == null) return;
+
     _binding = DripBinding<String>(
-      source: state,
+      source: source,
       apply: (value) {
-        // Construct a new TextSpan and assign it to the text property.
-        // RenderParagraph.text setter internally handles Painter updates.
-        text = TextSpan(text: value, style: style);
+        text = TextSpan(text: value, style: _style);
       },
       markNeeds: () {
-        // Rationale: Text content changes affect geometry (size/wrapping),
-        // so markNeedsLayout() is required.
-        if (attached) {
-          markNeedsLayout();
-        }
+        if (attached) markNeedsLayout();
       },
     );
   }
 
-  /// Disposes the current binding and stops updates.
+  /// Removes the active subscription but **preserves `_source`** so that
+  /// `attach()` can re-create the binding if Flutter remounts this
+  /// [RenderObject] in the same slot (Risk 4 / CI-1.2 fix).
+  ///
+  /// Call from `didUnmountRenderObject` — not from a full disposal path.
+  void detachBinding() {
+    _binding?.dispose();
+    _binding = null;
+    // _source is intentionally kept: attach() needs it to re-subscribe on remount.
+  }
+
+  /// Full teardown: disposes the binding **and** forgets the source.
+  ///
+  /// Use only when the source is being replaced (`bindState` with a new source)
+  /// or when the [RenderObject] itself is being permanently destroyed (`dispose`).
   void unbindState() {
     _binding?.dispose();
     _binding = null;
+    _source = null;
   }
 
+  // ── RenderObject lifecycle ────────────────────────────────────────────────
+
+  /// Risk 4 fix: binding is created here (on mount), not in bindState.
+  /// Risk 1 fix: re-asserts DRIP value immediately on mount, before first paint,
+  /// overwriting whatever Flutter wrote from the widget tree.
   @override
-  void dispose() {
-    unbindState();
-    super.dispose();
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    _createBinding();
   }
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
-    // DRIP updates happen in microtasks, which can dirty the layout between
-    // frames. RenderParagraph.hitTestChildren requires a valid layout to
-    // calculate glyph offsets. If dirty, we skip hit testing to avoid
-    // "Text layout not available" crashes.
     if (debugNeedsLayout) return false;
     return super.hitTestChildren(result, position: position);
+  }
+
+  @override
+  void dispose() {
+    unbindState(); // full teardown — source no longer needed.
+    super.dispose();
+  }
+
+  /// Risk 1 fix: re-asserts DRIP value after a hot reload (reassemble cycle).
+  @override
+  void reassemble() {
+    super.reassemble();
+    _binding?.reapply();
   }
 }
 
 /// A widget that renders text from a [DripReadable<String>] with zero rebuilds.
-///
-/// When the [state] changes, [DripText] updates the underlying [RenderParagraph]
-/// directly, bypassing the widget build cycle.
 class DripText extends LeafRenderObjectWidget {
-  /// The reactive state source for the text content.
   final DripReadable<String> state;
-
-  /// The style to use for the text.
   final TextStyle? style;
-
-  /// How the text should be aligned horizontally.
   final TextAlign textAlign;
-
-  /// The directionality of the text.
   final TextDirection? textDirection;
-
-  /// Whether the text should break at soft line breaks.
   final bool softWrap;
-
-  /// How visual overflow should be handled.
   final TextOverflow overflow;
-
-  /// An optional maximum number of lines for the text to span.
   final int? maxLines;
-
-  /// The scaling strategy to use for text.
   final TextScaler? textScaler;
 
-  /// Creates a [DripText] widget.
   const DripText(
     this.state, {
     super.key,
@@ -122,7 +157,7 @@ class DripText extends LeafRenderObjectWidget {
       maxLines: maxLines,
     );
 
-    // Initial binding
+    // Store source/style so attach() can create the binding.
     renderObject.bindState(state, style ?? const TextStyle());
 
     return renderObject;
@@ -141,14 +176,18 @@ class DripText extends LeafRenderObjectWidget {
       ..textScaler = textScaler ?? MediaQuery.textScalerOf(context)
       ..maxLines = maxLines;
 
-    // Always rebind to handle potential style or state reference changes.
-    // bindState disposes the old binding first.
+    // Risk 1 fix: re-assert DRIP value after Flutter has synced widget properties.
+    // Risk 4 fix: bindState calls reapply() if source unchanged — no subscription churn.
     renderObject.bindState(state, style ?? const TextStyle());
   }
 
   @override
   void didUnmountRenderObject(DripRenderParagraph renderObject) {
-    // Invariant 7: Ensure binding is destroyed when render object is unmounted.
-    renderObject.unbindState();
+    // Invariant 7: subscription removed when RenderObject unmounts.
+    // Use detachBinding(), NOT unbindState(), so that _source is preserved.
+    // Flutter may reuse the same RenderObject instance on remount (same slot,
+    // same type), in which case attach() fires again and needs _source to
+    // re-create the subscription (CI-1.2 fix).
+    renderObject.detachBinding();
   }
 }
