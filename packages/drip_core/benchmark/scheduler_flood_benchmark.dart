@@ -22,6 +22,8 @@
 /// PASS: frame time within 16ms gate
 /// ```
 
+library scheduler_flood_benchmark;
+
 import 'dart:async';
 
 import 'package:drip_core/drip_core.dart';

@@ -1,23 +1,31 @@
 name: drip_core
-description: "High-performance, zero-dependency reactive engine for the DRIP framework. Synchronous-only tracking with microtask coalescing."
-version: 0.5.1-alpha
+description: "Pure Dart reactive state management with microtask batching and single-propagation-pass updates, with zero Flutter dependency."
+version: 1.0.0
 homepage: https://github.com/Sam21-39/drip
-repository: https://github.com/Sam21-39/drip/tree/main/packages/drip_core
+repository: https://github.com/Sam21-39/drip
 issue_tracker: https://github.com/Sam21-39/drip/issues
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  meta: ^1.15.0
+  meta: '>=1.9.0 <3.0.0'
 
 dev_dependencies:
   test: ^1.25.0
-  coverage: ^1.9.0
+  # coverage: ^1.9.0
 
 topics:
   - state-management
   - reactive
-  - signals
+  - dart
   - performance
-  - flutter
+  - computed
+
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:

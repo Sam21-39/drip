@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:meta/meta.dart';
 
@@ -37,8 +36,8 @@ class DripBatch {
   /// Tracks pending propagation count for threshold detection.
   int _pendingCount = 0;
 
-  final Set<void Function()> _propagations = LinkedHashSet<void Function()>();
-  final Set<void Function()> _effects = LinkedHashSet<void Function()>();
+  final Set<void Function()> _propagations = <void Function()>{};
+  final Set<void Function()> _effects = <void Function()>{};
 
   /// Optional post-frame scheduler injected by `drip_flutter`.
   ///

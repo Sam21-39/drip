@@ -4,7 +4,7 @@ import 'package:drip_core/drip_core.dart';
 void main() {
   group('DripScope — Disposal Robustness (Risk 5)', () {
     // Helper that records which disposable indices were called.
-    (DripScope scope, List<bool> called) _buildScope({
+    (DripScope scope, List<bool> called) buildScope({
       required int count,
       required Set<int> throwAt, // 1-indexed
     }) {
@@ -24,7 +24,7 @@ void main() {
     }
 
     test('D-1.1: All 10 disposables called even when #5 throws', () {
-      final (scope, called) = _buildScope(count: 10, throwAt: {5});
+      final (scope, called) = buildScope(count: 10, throwAt: {5});
 
       DripDisposalError? caught;
       try {
@@ -42,7 +42,7 @@ void main() {
     });
 
     test('D-1.2: All 10 disposables called when #3, #6, #9 throw', () {
-      final (scope, called) = _buildScope(count: 10, throwAt: {3, 6, 9});
+      final (scope, called) = buildScope(count: 10, throwAt: {3, 6, 9});
 
       DripDisposalError? caught;
       try {
@@ -57,14 +57,14 @@ void main() {
     });
 
     test('D-1.3: No error thrown when all disposables succeed', () {
-      final (scope, called) = _buildScope(count: 5, throwAt: {});
+      final (scope, called) = buildScope(count: 5, throwAt: {});
 
       expect(() => scope.dispose(), returnsNormally);
       expect(called, everyElement(isTrue));
     });
 
     test('D-1.4: DripDisposalError contains stack traces for each error', () {
-      final (scope, _) = _buildScope(count: 3, throwAt: {2});
+      final (scope, _) = buildScope(count: 3, throwAt: {2});
 
       DripDisposalError? caught;
       try {
@@ -78,7 +78,7 @@ void main() {
     });
 
     test('D-1.5: DripDisposalError.toString() names the scope and count', () {
-      final (scope, _) = _buildScope(count: 4, throwAt: {1, 3});
+      final (scope, _) = buildScope(count: 4, throwAt: {1, 3});
 
       DripDisposalError? caught;
       try {

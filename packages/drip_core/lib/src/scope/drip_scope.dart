@@ -12,8 +12,9 @@ class DripScope {
   final List<void Function()> _disposals = [];
 
   DripScope({this.debugName, DripScope? parent}) : _parent = parent {
-    if (_parent != null) {
-      _parent.registerDisposal(dispose);
+    final parentScope = _parent;
+    if (parentScope != null) {
+      parentScope.registerDisposal(dispose);
     }
   }
 

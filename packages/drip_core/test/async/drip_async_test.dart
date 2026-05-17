@@ -4,16 +4,17 @@ import 'package:test/test.dart';
 
 void main() {
   group('DripAsync', () {
-    test('AS-1.1: Initial state is DripLoading with null previous data', () {
+    test('AS-1.1: Initial state is DripAsyncLoading with null previous data',
+        () {
       final state = DripAsync<int>();
-      expect(state.value, isA<DripLoading<int>>());
+      expect(state.value, isA<DripAsyncLoading<int>>());
       expect(state.value.dataOrNull, null);
     });
 
-    test('AS-1.2: setData(v) transitions to DripData', () {
+    test('AS-1.2: setData(v) transitions to DripAsyncData', () {
       final state = DripAsync<int>();
       state.setData(42);
-      expect(state.value, isA<DripData<int>>());
+      expect(state.value, isA<DripAsyncData<int>>());
       expect(state.value.dataOrNull, 42);
     });
 
@@ -21,7 +22,7 @@ void main() {
       final state = DripAsync<int>();
       state.setData(42);
       state.setLoading();
-      expect(state.value, isA<DripLoading<int>>());
+      expect(state.value, isA<DripAsyncLoading<int>>());
       expect(state.value.dataOrNull, 42);
     });
 
@@ -29,22 +30,23 @@ void main() {
       final state = DripAsync<int>();
       state.setData(42);
       state.setError(Exception(), StackTrace.empty);
-      expect(state.value, isA<DripError<int>>());
+      expect(state.value, isA<DripAsyncError<int>>());
       expect(state.value.dataOrNull, 42);
     });
 
     test('AS-1.6: run() transitions: loading -> data on success', () async {
       final state = DripAsync<int>();
       await state.run(() async => 42);
-      expect(state.value, isA<DripData<int>>());
+      expect(state.value, isA<DripAsyncData<int>>());
       expect(state.value.dataOrNull, 42);
     });
 
     test('AS-1.7: run() transitions: loading -> error on failure', () async {
       final state = DripAsync<int>();
       await state.run(() async => throw Exception('failed'));
-      expect(state.value, isA<DripError<int>>());
-      expect((state.value as DripError).error.toString(), contains('failed'));
+      expect(state.value, isA<DripAsyncError<int>>());
+      expect(
+          (state.value as DripAsyncError).error.toString(), contains('failed'));
     });
 
     test('AS-1.8: run() preserves previous data in loading state', () async {
@@ -54,7 +56,7 @@ void main() {
       final completer = Completer<int>();
       final runFuture = state.run(() => completer.future);
 
-      expect(state.value, isA<DripLoading<int>>());
+      expect(state.value, isA<DripAsyncLoading<int>>());
       expect(state.value.dataOrNull, 42);
 
       completer.complete(43);
@@ -78,14 +80,14 @@ void main() {
       await run1;
 
       // State should still be loading because run2 is active
-      expect(state.value, isA<DripLoading<int>>());
+      expect(state.value, isA<DripAsyncLoading<int>>());
 
       // Complete second
       completer2.complete(2);
       await run2;
 
       // State should be data from second
-      expect(state.value, isA<DripData<int>>());
+      expect(state.value, isA<DripAsyncData<int>>());
       expect(state.value.dataOrNull, 2);
     });
 
@@ -94,11 +96,11 @@ void main() {
       final completer = Completer<int>();
       final state = DripAsync.fromFuture(completer.future);
 
-      expect(state.value, isA<DripLoading<int>>());
+      expect(state.value, isA<DripAsyncLoading<int>>());
       completer.complete(42);
 
       await Future.microtask(() {}); // allow run to finish
-      expect(state.value, isA<DripData<int>>());
+      expect(state.value, isA<DripAsyncData<int>>());
       expect(state.value.dataOrNull, 42);
     });
 
@@ -106,11 +108,11 @@ void main() {
       final controller = StreamController<int>();
       final state = DripAsync.fromStream(controller.stream, scope: DripScope());
 
-      expect(state.value, isA<DripLoading<int>>());
+      expect(state.value, isA<DripAsyncLoading<int>>());
       controller.add(42);
 
       await Future.microtask(() {});
-      expect(state.value, isA<DripData<int>>());
+      expect(state.value, isA<DripAsyncData<int>>());
       expect(state.value.dataOrNull, 42);
       controller.close();
     });
@@ -139,6 +141,32 @@ void main() {
       state.setLoading();
       await Future.microtask(() {});
       expect(calls, 2);
+    });
+
+    test('AS-1.18: fromStream() stream error handles error and preserves data',
+        () async {
+      final controller = StreamController<int>();
+      final state = DripAsync.fromStream(controller.stream, scope: DripScope());
+      state.setData(42);
+
+      controller.addError(Exception('stream fail'), StackTrace.empty);
+      await Future.microtask(() {});
+
+      expect(state.value, isA<DripAsyncError<int>>());
+      expect(state.value.dataOrNull, 42);
+      expect((state.value as DripAsyncError).error.toString(),
+          contains('stream fail'));
+      controller.close();
+    });
+
+    test('AS-1.19: fromStream() without scope triggers assertion in debug mode',
+        () {
+      final controller = StreamController<int>();
+      expect(
+        () => DripAsync.fromStream(controller.stream),
+        throwsA(isA<AssertionError>()),
+      );
+      controller.close();
     });
   });
 }

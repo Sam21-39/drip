@@ -24,16 +24,17 @@ class SelectorDemoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DripNodeProvider<SelectorDemoNode>(
+    return DripLifecycle<SelectorDemoNode>(
       create: () => SelectorDemoNode(),
-      builder: (context, node) {
+      builder: (node) {
         return Scaffold(
           appBar: AppBar(title: const Text('DripSelect Demo')),
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('DripSelect (Rebuilds only when username or unread changes):'),
+                const Text(
+                    'DripSelect (Rebuilds only when username or unread changes):'),
                 const SizedBox(height: 16),
                 DripSelect2<String, int, (String, int)>(
                   source1: node.username,
@@ -57,7 +58,8 @@ class SelectorDemoScreen extends StatelessWidget {
                 DripBuilder<int>(
                   source: node.unrelatedState,
                   builder: (context, value) {
-                    return Text('Unrelated state (Rebuilds independently): $value');
+                    return Text(
+                        'Unrelated state (Rebuilds independently): $value');
                   },
                 ),
                 const SizedBox(height: 32),

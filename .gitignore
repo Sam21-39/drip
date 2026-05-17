@@ -21,9 +21,29 @@ Thumbs.db
 
 # Melos
 .melos_tool/
+pubspec_overrides.yaml
 
 # Scripts
 drip_setup.sh
 .dart-cli-completion
 # FVM
 .fvm/
+
+# Local Environment Sandbox Workarounds
+.flutter_sdk/
+.dart_home/
+tmp_flutter/
+tmp_home/
+.tmp_home/
+
+# Logs and temporary files
+*.log
+*.txt
+
+# Native platform directories (apps/examples)
+android/
+ios/
+macos/
+linux/
+windows/
+web/

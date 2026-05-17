@@ -28,6 +28,7 @@ class DripState<T> extends DripStateBase implements DripReadable<T> {
 
   /// The current value of this state.
   /// Records a dependency if a [TrackingContext] is active.
+  @override
   T get value {
     TrackingContext.current?.recordRead(this);
     return _value;
@@ -41,7 +42,7 @@ class DripState<T> extends DripStateBase implements DripReadable<T> {
   /// A violation indicates that type [T] implements `==` without a consistent
   /// `hashCode` override, which silently corrupts DRIP's deduplication logic.
   ///
-  /// This check is performed via [assert] and is completely absent in release
+  /// This check is performed via `assert` and is completely absent in release
   /// builds — zero production overhead.
   void write(T newValue) {
     // Debug-mode equality/hashCode contract check.

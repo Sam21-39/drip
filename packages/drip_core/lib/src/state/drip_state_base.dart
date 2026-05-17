@@ -30,7 +30,7 @@ abstract class DripStateBase {
 
   /// The set of subscribers watching this state.
   /// Using [LinkedHashSet] for deterministic iteration order during propagation.
-  final Set<Subscriber> subscribers = LinkedHashSet<Subscriber>();
+  final Set<Subscriber> subscribers = <Subscriber>{};
 
   /// Adds a subscriber to this state.
   void addSubscriber(Subscriber subscriber) {

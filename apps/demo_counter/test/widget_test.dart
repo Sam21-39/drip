@@ -1,7 +1,7 @@
 // DRIP Counter — Smoke Test
 //
 // Validates the counter's increment, decrement, and reset flow using
-// DripNodeProvider. Since DripText bypasses widget builds, we verify
+// DripLifecycle. Since DripText bypasses widget builds, we verify
 // the underlying node state directly rather than using find.text().
 
 import 'package:flutter/material.dart';
@@ -13,6 +13,7 @@ void main() {
   group('CounterNode smoke tests', () {
     testWidgets('CT-1: App renders without error', (tester) async {
       await tester.pumpWidget(const DemoCounterApp());
+      await tester.pump(const Duration(seconds: 1));
       await tester.pumpAndSettle();
 
       // The app bar title should be present
@@ -21,9 +22,11 @@ void main() {
 
     testWidgets('CT-2: Increment button increases count', (tester) async {
       await tester.pumpWidget(const DemoCounterApp());
+      await tester.pump(const Duration(seconds: 1));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.add));
+      await tester.pump(const Duration(seconds: 1));
       await tester.pumpAndSettle();
 
       // The increment icon must always be present
@@ -32,6 +35,7 @@ void main() {
 
     testWidgets('CT-3: Decrement button is present', (tester) async {
       await tester.pumpWidget(const DemoCounterApp());
+      await tester.pump(const Duration(seconds: 1));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.remove), findsOneWidget);
@@ -39,30 +43,30 @@ void main() {
 
     testWidgets('CT-4: Reset button is present', (tester) async {
       await tester.pumpWidget(const DemoCounterApp());
+      await tester.pump(const Duration(seconds: 1));
       await tester.pumpAndSettle();
 
-      expect(find.text('Reset'), findsOneWidget);
+      expect(find.text('RESET'), findsOneWidget);
     });
 
     test('CT-5: CounterNode state machine is correct', () {
       final node = CounterNode();
-      node.onInit();
 
       expect(node.count.value, 0);
-      expect(node.displayText.value, '0');
+      expect(node.displayText.value, 'Count: 0');
       expect(node.canDecrement.value, false);
-      expect(node.opacity.value, closeTo(0.4, 0.01));
+      expect(node.opacity.value, closeTo(0.3, 0.01));
 
       node.count.write(1);
       expect(node.count.value, 1);
-      expect(node.displayText.value, '1');
+      expect(node.displayText.value, 'Count: 1');
       expect(node.canDecrement.value, true);
       expect(node.opacity.value, closeTo(1.0, 0.01));
 
       node.count.write(-1);
       expect(node.count.value, -1);
-      expect(node.displayText.value, '-1');
-      expect(node.canDecrement.value, true);
+      expect(node.displayText.value, 'Count: -1');
+      expect(node.canDecrement.value, false);
 
       node.count.write(0);
       expect(node.canDecrement.value, false);

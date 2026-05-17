@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:test/test.dart';
 import 'package:drip_core/drip_core.dart';
+import 'package:drip_core/src/batch/drip_batch.dart';
 
 void main() {
   setUp(() {

@@ -1,5 +1,7 @@
 import 'package:test/test.dart';
 import 'package:drip_core/drip_core.dart';
+import 'package:drip_core/src/batch/drip_batch.dart';
+import 'package:drip_core/src/batch/drip_scheduler_config.dart';
 
 void main() {
   setUp(() {

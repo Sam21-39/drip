@@ -53,5 +53,41 @@ void main() {
       // Since I can't do that easily without reflection, I'll rely on the
       // DripScope implementation which has a try-catch.
     });
+
+    test(
+        '5.8 DripCircularDependencyError and DripDisposedScopeError toString()',
+        () {
+      final circErr = DripCircularDependencyError('loop');
+      expect(
+          circErr.toString(),
+          contains(
+              'DripCircularDependencyError: Circular dependency detected in "loop"'));
+
+      final dispErr = DripDisposedScopeError('myScope');
+      expect(
+          dispErr.toString(),
+          contains(
+              'DripDisposedScopeError: Scope "myScope" has been disposed'));
+    });
+
+    test('5.9 Parent scope automatically disposes child scope', () {
+      final parent = DripScope();
+      final child = DripScope(parent: parent);
+
+      var childStateDisposed = false;
+      final childState = child.state(42);
+      childState.addListener(() {}); // Add listener to keep active
+      child.registerDisposal(() {
+        childStateDisposed = true;
+      });
+
+      parent.dispose();
+      expect(childStateDisposed, true);
+    });
+
+    test('5.10 resolve() always returns null in Phase A', () {
+      final scope = DripScope();
+      expect(scope.resolve<int>(), isNull);
+    });
   });
 }

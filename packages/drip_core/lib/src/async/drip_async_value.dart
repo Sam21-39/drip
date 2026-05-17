@@ -5,48 +5,48 @@ import 'package:meta/meta.dart';
 sealed class DripAsyncValue<T> {
   const DripAsyncValue();
 
-  /// True if and only if this is [DripLoading].
-  bool get isLoading => this is DripLoading<T>;
+  /// True if and only if this is [DripAsyncLoading].
+  bool get isLoading => this is DripAsyncLoading<T>;
 
-  /// True if and only if this is [DripData].
-  bool get hasData => this is DripData<T>;
+  /// True if and only if this is [DripAsyncData].
+  bool get hasData => this is DripAsyncData<T>;
 
-  /// True if and only if this is [DripError].
-  bool get hasError => this is DripError<T>;
+  /// True if and only if this is [DripAsyncError].
+  bool get hasError => this is DripAsyncError<T>;
 
   /// Returns true if previousData is non-null in Loading or Error states.
   bool get hasPreviousData {
     final self = this;
-    if (self is DripLoading<T>) return self.previousData != null;
-    if (self is DripError<T>) return self.previousData != null;
+    if (self is DripAsyncLoading<T>) return self.previousData != null;
+    if (self is DripAsyncError<T>) return self.previousData != null;
     return false;
   }
 
-  /// Returns the current value if [DripData], or [previousData] if available in other states.
+  /// Returns the current value if [DripAsyncData], or `previousData` if available in other states.
   T? get dataOrNull {
     final self = this;
-    if (self is DripData<T>) return self.value;
-    if (self is DripLoading<T>) return self.previousData;
-    if (self is DripError<T>) return self.previousData;
+    if (self is DripAsyncData<T>) return self.value;
+    if (self is DripAsyncLoading<T>) return self.previousData;
+    if (self is DripAsyncError<T>) return self.previousData;
     return null;
   }
 
   /// Returns the available data or a fallback if no data is available.
   T getDataOr(T fallback) => dataOrNull ?? fallback;
 
-  /// Transforms the data inside [DripData] or the [previousData] in other states.
+  /// Transforms the data inside [DripAsyncData] or the `previousData` in other states.
   DripAsyncValue<R> map<R>(R Function(T value) transform) {
     final self = this;
-    if (self is DripData<T>) {
-      return DripData<R>(transform(self.value));
-    } else if (self is DripLoading<T>) {
+    if (self is DripAsyncData<T>) {
+      return DripAsyncData<R>(transform(self.value));
+    } else if (self is DripAsyncLoading<T>) {
       final prev = self.previousData;
-      return DripLoading<R>(
+      return DripAsyncLoading<R>(
         previousData: prev != null ? transform(prev) : null,
       );
-    } else if (self is DripError<T>) {
+    } else if (self is DripAsyncError<T>) {
       final prev = self.previousData;
-      return DripError<R>(
+      return DripAsyncError<R>(
         self.error,
         self.stackTrace,
         previousData: prev != null ? transform(prev) : null,
@@ -57,22 +57,22 @@ sealed class DripAsyncValue<T> {
 }
 
 /// Represents in-progress computation.
-class DripLoading<T> extends DripAsyncValue<T> {
+class DripAsyncLoading<T> extends DripAsyncValue<T> {
   final T? previousData;
-  const DripLoading({this.previousData});
+  const DripAsyncLoading({this.previousData});
 }
 
 /// Represents successful completion.
-class DripData<T> extends DripAsyncValue<T> {
+class DripAsyncData<T> extends DripAsyncValue<T> {
   final T value;
-  const DripData(this.value);
+  const DripAsyncData(this.value);
 }
 
 /// Represents failed computation.
-class DripError<T> extends DripAsyncValue<T> {
+class DripAsyncError<T> extends DripAsyncValue<T> {
   final Object error;
   final StackTrace stackTrace;
   final T? previousData;
 
-  const DripError(this.error, this.stackTrace, {this.previousData});
+  const DripAsyncError(this.error, this.stackTrace, {this.previousData});
 }

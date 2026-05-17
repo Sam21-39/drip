@@ -1,0 +1,5 @@
+coverage/
+--coverage-path=coverage/
+doc/api/
+.dart_tool/
+build/

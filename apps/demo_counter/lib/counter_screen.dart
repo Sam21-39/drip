@@ -7,9 +7,9 @@ class CounterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DripNodeProvider<CounterNode>(
+    return DripLifecycle<CounterNode>(
       create: () => CounterNode(),
-      builder: (context, node) {
+      builder: (node) {
         return Scaffold(
           appBar: AppBar(title: const Text('DRIP Counter Node')),
           body: Center(

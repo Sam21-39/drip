@@ -3,11 +3,11 @@
 [![pub package](https://img.shields.io/pub/v/drip_core.svg)](https://pub.dev/packages/drip_core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Direct Render Isolated Propagation** — A high-performance, pure Dart reactive engine.
+**Direct Render Isolated Propagation** — A pure Dart reactive engine for fine-grained state updates.
 
 DRIP Core is the zero-dependency state engine powering the DRIP framework. It provides atomic reactive primitives with **synchronous-only tracking** and **microtask-based coalescing**, giving the Flutter render layer the granularity needed to bypass the widget tree entirely.
 
-> ⚠️ **Early Alpha**: APIs are stable within the alpha series but subject to change before v1.0.0.
+> **Stable API**: `drip_core 1.0.0` is the stable core release. Public API removals now require a major version bump.
 
 ---
 
@@ -28,7 +28,7 @@ DRIP Core is the zero-dependency state engine powering the DRIP framework. It pr
 | `DripState<T>` | The source of truth. Holds a typed value and a version clock. |
 | `DripComputed<T>` | Lazily evaluated, cached derivation. Recomputes only when dependencies change. |
 | `DripAsync<T>` | Reactive async state container. Manages transitions between loading, data, and error states with concurrent call cancellation. |
-| `DripAsyncValue<T>` | Sealed class (`DripLoading`, `DripData`, `DripError`) providing exhaustive state mapping and `previousData` preservation. |
+| `DripAsyncValue<T>` | Sealed class (`DripAsyncLoading`, `DripAsyncData`, `DripAsyncError`) providing exhaustive state mapping and `previousData` preservation. |
 | `DripEffect` | Automatic side-effect. Runs once on creation, re-runs on dependency change. |
 | `DripScope` | Resource owner. Disposes registered nodes in LIFO order. |
 | `DripReadable<T>` | Shared read/subscribe interface implemented by `DripState`, `DripComputed`, and `DripAsync`. |
@@ -113,7 +113,7 @@ display(upper);    // ✅
 
 ```yaml
 dependencies:
-  drip_core: ^0.5.1-alpha
+  drip_core: ^1.0.0
 ```
 
 ---
