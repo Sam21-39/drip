@@ -50,7 +50,7 @@ No binding may survive its `RenderObject`.
 ┌─────────────────────────────────────────┐
 │         Application / DripNode          │  ← Feature modules, DI, lifecycle
 ├─────────────────────────────────────────┤
-│        drip_core_flutter                │  ← DripText, DripOpacity, DripFrame
+│        drip_flutter                     │  ← DripText, DripOpacity, DripFrame
 │        (Render layer)                   │     Binds DripState → RenderObject
 ├─────────────────────────────────────────┤
 │        drip_core                        │  ← DripState, DripComputed,

@@ -2,15 +2,94 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:drip_core/drip_core.dart';
 
-/// A multi-source reactive builder for two sources.
-class DripSelect2<A, B, R> extends StatefulWidget {
+/// Builds from selected values across multiple reactive sources.
+///
+/// Use [DripSelect] when a widget depends on a derived slice of two or more
+/// [DripReadable] values and should rebuild only when that selected slice
+/// changes. The static constructors cover the supported source arities while
+/// keeping the public API centered on a single frozen symbol.
+///
+/// ```dart
+/// DripSelect.two<int, int, int>(
+///   source1: first,
+///   source2: second,
+///   selector: (a, b) => a + b,
+///   builder: (context, total) => Text('$total'),
+/// )
+/// ```
+abstract final class DripSelect {
+  /// Creates a selector widget for two reactive sources.
+  static Widget two<A, B, R>({
+    Key? key,
+    required DripReadable<A> source1,
+    required DripReadable<B> source2,
+    required R Function(A a, B b) selector,
+    required Widget Function(BuildContext context, R value) builder,
+    bool Function(R a, R b)? identity,
+  }) {
+    return _DripSelect2<A, B, R>(
+      key: key,
+      source1: source1,
+      source2: source2,
+      selector: selector,
+      builder: builder,
+      identity: identity,
+    );
+  }
+
+  /// Creates a selector widget for three reactive sources.
+  static Widget three<A, B, C, R>({
+    Key? key,
+    required DripReadable<A> source1,
+    required DripReadable<B> source2,
+    required DripReadable<C> source3,
+    required R Function(A a, B b, C c) selector,
+    required Widget Function(BuildContext context, R value) builder,
+    bool Function(R a, R b)? identity,
+  }) {
+    return _DripSelect3<A, B, C, R>(
+      key: key,
+      source1: source1,
+      source2: source2,
+      source3: source3,
+      selector: selector,
+      builder: builder,
+      identity: identity,
+    );
+  }
+
+  /// Creates a selector widget for four reactive sources.
+  static Widget four<A, B, C, D, R>({
+    Key? key,
+    required DripReadable<A> source1,
+    required DripReadable<B> source2,
+    required DripReadable<C> source3,
+    required DripReadable<D> source4,
+    required R Function(A a, B b, C c, D d) selector,
+    required Widget Function(BuildContext context, R value) builder,
+    bool Function(R a, R b)? identity,
+  }) {
+    return _DripSelect4<A, B, C, D, R>(
+      key: key,
+      source1: source1,
+      source2: source2,
+      source3: source3,
+      source4: source4,
+      selector: selector,
+      builder: builder,
+      identity: identity,
+    );
+  }
+}
+
+class _DripSelect2<A, B, R> extends StatefulWidget {
   final DripReadable<A> source1;
   final DripReadable<B> source2;
   final R Function(A a, B b) selector;
   final Widget Function(BuildContext context, R value) builder;
   final bool Function(R a, R b)? identity;
 
-  const DripSelect2({
+  const _DripSelect2({
     super.key,
     required this.source1,
     required this.source2,
@@ -20,10 +99,10 @@ class DripSelect2<A, B, R> extends StatefulWidget {
   });
 
   @override
-  State<DripSelect2<A, B, R>> createState() => _DripSelect2State<A, B, R>();
+  State<_DripSelect2<A, B, R>> createState() => _DripSelect2State<A, B, R>();
 }
 
-class _DripSelect2State<A, B, R> extends State<DripSelect2<A, B, R>> {
+class _DripSelect2State<A, B, R> extends State<_DripSelect2<A, B, R>> {
   late R _currentValue;
   bool _isDirty = false;
 
@@ -57,7 +136,7 @@ class _DripSelect2State<A, B, R> extends State<DripSelect2<A, B, R>> {
   }
 
   @override
-  void didUpdateWidget(DripSelect2<A, B, R> oldWidget) {
+  void didUpdateWidget(_DripSelect2<A, B, R> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.source1 != widget.source1 ||
         oldWidget.source2 != widget.source2) {
@@ -83,8 +162,7 @@ class _DripSelect2State<A, B, R> extends State<DripSelect2<A, B, R>> {
   }
 }
 
-/// A multi-source reactive builder for three sources.
-class DripSelect3<A, B, C, R> extends StatefulWidget {
+class _DripSelect3<A, B, C, R> extends StatefulWidget {
   final DripReadable<A> source1;
   final DripReadable<B> source2;
   final DripReadable<C> source3;
@@ -92,7 +170,7 @@ class DripSelect3<A, B, C, R> extends StatefulWidget {
   final Widget Function(BuildContext context, R value) builder;
   final bool Function(R a, R b)? identity;
 
-  const DripSelect3({
+  const _DripSelect3({
     super.key,
     required this.source1,
     required this.source2,
@@ -103,11 +181,11 @@ class DripSelect3<A, B, C, R> extends StatefulWidget {
   });
 
   @override
-  State<DripSelect3<A, B, C, R>> createState() =>
+  State<_DripSelect3<A, B, C, R>> createState() =>
       _DripSelect3State<A, B, C, R>();
 }
 
-class _DripSelect3State<A, B, C, R> extends State<DripSelect3<A, B, C, R>> {
+class _DripSelect3State<A, B, C, R> extends State<_DripSelect3<A, B, C, R>> {
   late R _currentValue;
   bool _isDirty = false;
 
@@ -149,7 +227,7 @@ class _DripSelect3State<A, B, C, R> extends State<DripSelect3<A, B, C, R>> {
   }
 
   @override
-  void didUpdateWidget(DripSelect3<A, B, C, R> oldWidget) {
+  void didUpdateWidget(_DripSelect3<A, B, C, R> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.source1 != widget.source1 ||
         oldWidget.source2 != widget.source2 ||
@@ -182,8 +260,7 @@ class _DripSelect3State<A, B, C, R> extends State<DripSelect3<A, B, C, R>> {
   }
 }
 
-/// A multi-source reactive builder for four sources.
-class DripSelect4<A, B, C, D, R> extends StatefulWidget {
+class _DripSelect4<A, B, C, D, R> extends StatefulWidget {
   final DripReadable<A> source1;
   final DripReadable<B> source2;
   final DripReadable<C> source3;
@@ -192,7 +269,7 @@ class DripSelect4<A, B, C, D, R> extends StatefulWidget {
   final Widget Function(BuildContext context, R value) builder;
   final bool Function(R a, R b)? identity;
 
-  const DripSelect4({
+  const _DripSelect4({
     super.key,
     required this.source1,
     required this.source2,
@@ -204,12 +281,12 @@ class DripSelect4<A, B, C, D, R> extends StatefulWidget {
   });
 
   @override
-  State<DripSelect4<A, B, C, D, R>> createState() =>
+  State<_DripSelect4<A, B, C, D, R>> createState() =>
       _DripSelect4State<A, B, C, D, R>();
 }
 
 class _DripSelect4State<A, B, C, D, R>
-    extends State<DripSelect4<A, B, C, D, R>> {
+    extends State<_DripSelect4<A, B, C, D, R>> {
   late R _currentValue;
   bool _isDirty = false;
 
@@ -254,7 +331,7 @@ class _DripSelect4State<A, B, C, D, R>
   }
 
   @override
-  void didUpdateWidget(DripSelect4<A, B, C, D, R> oldWidget) {
+  void didUpdateWidget(_DripSelect4<A, B, C, D, R> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.source1 != widget.source1 ||
         oldWidget.source2 != widget.source2 ||

@@ -147,8 +147,14 @@ class DripText extends LeafRenderObjectWidget {
 
   @override
   DripRenderParagraph createRenderObject(BuildContext context) {
+    final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
+    TextStyle? effectiveTextStyle = style;
+    if (style == null || style!.inherit) {
+      effectiveTextStyle = defaultTextStyle.style.merge(style);
+    }
+
     final renderObject = DripRenderParagraph(
-      TextSpan(text: state.value, style: style),
+      TextSpan(text: state.value, style: effectiveTextStyle),
       textAlign: textAlign,
       textDirection: textDirection ?? Directionality.of(context),
       softWrap: softWrap,
@@ -158,7 +164,7 @@ class DripText extends LeafRenderObjectWidget {
     );
 
     // Store source/style so attach() can create the binding.
-    renderObject.bindState(state, style ?? const TextStyle());
+    renderObject.bindState(state, effectiveTextStyle ?? const TextStyle());
 
     return renderObject;
   }
@@ -168,6 +174,12 @@ class DripText extends LeafRenderObjectWidget {
     BuildContext context,
     DripRenderParagraph renderObject,
   ) {
+    final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
+    TextStyle? effectiveTextStyle = style;
+    if (style == null || style!.inherit) {
+      effectiveTextStyle = defaultTextStyle.style.merge(style);
+    }
+
     renderObject
       ..textAlign = textAlign
       ..textDirection = textDirection ?? Directionality.of(context)
@@ -178,7 +190,7 @@ class DripText extends LeafRenderObjectWidget {
 
     // Risk 1 fix: re-assert DRIP value after Flutter has synced widget properties.
     // Risk 4 fix: bindState calls reapply() if source unchanged — no subscription churn.
-    renderObject.bindState(state, style ?? const TextStyle());
+    renderObject.bindState(state, effectiveTextStyle ?? const TextStyle());
   }
 
   @override

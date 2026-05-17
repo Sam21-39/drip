@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:drip_core/drip_core.dart';
 import 'package:drip_flutter/drip_flutter.dart';
 
-class TestAsyncNode extends DripNode with DripAsyncNodeMixin {
+class TestAsyncNode extends DripNode with DripAsyncNode {
   late DripAsync<int> futureAsync;
   late DripAsync<int> streamAsync;
 
@@ -18,7 +18,7 @@ class TestAsyncNode extends DripNode with DripAsyncNodeMixin {
 }
 
 void main() {
-  group('DripAsyncNodeMixin', () {
+  group('DripAsyncNode', () {
     test('AN-1.1: runAsync() returns DripAsync<T> in loading state', () {
       final node = TestAsyncNode();
       expect(node.futureAsync.value, isA<DripAsyncLoading<int>>());

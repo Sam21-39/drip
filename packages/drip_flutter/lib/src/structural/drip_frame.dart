@@ -15,7 +15,7 @@ class DripFrame<T> {
 
   /// Returns the current value of the frame.
   ///
-  /// This getter does NOT register with any [TrackingContext].
+  /// This getter does not register reactive dependencies.
   T get value => _value;
 
   /// Updates the frame value and notifies listeners synchronously.

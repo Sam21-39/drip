@@ -1,9 +1,8 @@
-import 'package:drip_flutter/drip_flutter.dart';
 import 'package:flutter/material.dart';
 import 'grid_demo.dart';
 
 void main() {
-  DripFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const DemoGridApp());
 }
 

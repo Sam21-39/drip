@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:drip_core/drip_core.dart';
 import 'package:drip_flutter/drip_flutter.dart';
+import 'package:drip_flutter/src/render/drip_text.dart';
+import 'package:drip_flutter/src/render/drip_color.dart';
+import 'package:drip_flutter/src/render/drip_opacity.dart';
 
 // ---------------------------------------------------------------------------
 // Test-only DripState subclass that counts listener registrations.

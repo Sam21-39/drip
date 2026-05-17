@@ -1,14 +1,34 @@
-// ignore_for_file: deprecated_member_use_from_same_package
 import 'package:meta/meta.dart';
 import 'package:drip_core/drip_core.dart';
-import '../list/drip_list.dart';
 
 /// Abstract feature module with an owned [DripScope].
 ///
-/// Encapsulates state, computed values, side effects, and dependencies.
-/// All reactive resources created via [state], [computed], [effect], and [list]
-/// are bound to the node's lifecycle and are automatically disposed when
-/// the node is disposed.
+/// [DripNode] is a convenience base class for grouping related reactive state,
+/// computed values, effects, and dependencies behind a shared lifecycle. It is
+/// not a required DRIP pattern, and there is no performance difference between
+/// using a node and using a plain Dart class that owns a [DripScope]. The node
+/// adds only a default scope, standardized [onInit] and [onDispose] hooks, and a
+/// debug name based on the runtime type unless one is provided.
+///
+/// The two examples below are equivalent:
+///
+/// ```dart
+/// class CounterNode extends DripNode {
+///   late final count = state(0, debugName: 'count');
+///   late final doubled = computed(() => count.value * 2);
+///
+///   void increment() => count.write(count.value + 1);
+/// }
+///
+/// class CounterModel {
+///   final scope = DripScope(debugName: 'CounterModel');
+///   late final count = scope.state(0, debugName: 'count');
+///   late final doubled = scope.computed(() => count.value * 2);
+///
+///   void increment() => count.write(count.value + 1);
+///   void dispose() => scope.dispose();
+/// }
+/// ```
 abstract class DripNode {
   late final DripScope _scope;
 
@@ -55,13 +75,6 @@ abstract class DripNode {
   /// Creates a [DripEffect] owned by this node's scope.
   DripEffect effect(void Function() fn, {String? debugName}) {
     return _scope.effect(fn, debugName: debugName);
-  }
-
-  /// Creates a [DripList] owned by this node.
-  DripList<T> list<T>(List<T> initial) {
-    final list = DripList<T>(initial);
-    _scope.registerDisposal(list.dispose);
-    return list;
   }
 
   /// Registers a disposal callback bounded to this node's scope.

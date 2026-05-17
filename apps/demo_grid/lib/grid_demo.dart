@@ -14,10 +14,10 @@ const int _kGridColumns = 40;
 const int _kGridRows = 25;
 const int _kCellCount = _kGridColumns * _kGridRows; // 1000
 
-/// All 1000 cell states. Static final — lives for the duration of the app.
-final List<DripState<String>> _cellStates = List.generate(
-  _kCellCount,
-  (i) => dripState(_cellLabel(i, 0), debugName: 'cell_$i'),
+/// All 1000 cell states managed by a high-performance [DripItems] collection.
+final DripItems<String> _cellItems = DripItems<String>(
+  List.generate(_kCellCount, (i) => _cellLabel(i, 0)),
+  debugName: 'grid_cells',
 );
 
 /// Frame counter for the statistical rebuild counter (updated via setState,
@@ -57,7 +57,7 @@ class _GridDemoScreenState extends State<GridDemoScreen>
     _updateTimer = Timer.periodic(const Duration(milliseconds: 16), (_) {
       _tick++;
       for (var i = 0; i < _kCellCount; i++) {
-        _cellStates[i].write(_cellLabel(i, _tick));
+        _cellItems[i].write(_cellLabel(i, _tick));
       }
     });
 
@@ -134,14 +134,21 @@ class _GridCell extends StatelessWidget {
         borderRadius: BorderRadius.circular(1),
       ),
       child: Center(
-        child: DripText(
-          _cellStates[index],
+        child: DefaultTextStyle(
           style: TextStyle(
             fontSize: 7,
             fontFamily: 'monospace',
             color: color,
             fontWeight: FontWeight.bold,
             letterSpacing: -0.5,
+          ),
+          child: DripItemBuilder<String>(
+            items: _cellItems,
+            index: index,
+            renderMode: true,
+            builder: (context, value) {
+              return Text(value);
+            },
           ),
         ),
       ),

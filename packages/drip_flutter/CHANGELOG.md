@@ -1,13 +1,75 @@
+## [0.7.0-alpha] — 2026-05-17
+
+### API Freeze
+The drip_flutter public API is now frozen. No new widgets, classes, or
+functions will be added without a documented proposal. No public symbol will
+be removed without a deprecation cycle of at least one minor version. This
+version is the last pre-1.0.0 version before the drip_flutter 1.0.0 stable
+release.
+
+### Frozen API Surface
+- `DripText` — binds `DripState<String>` to text rendering.
+- `DripOpacity` — binds `DripState<double>` to opacity.
+- `DripColor` — binds `DripState<Color>` to background color.
+- `DripTransform` — binds `DripState<Matrix4>` to transforms.
+- `DripImage` — binds `DripState<ImageProvider>` to images.
+- `DripCustomBinding<T>` — user-defined render binding base.
+- `DripFrame<T>` — controlled structural update frame.
+- `DripFrameBuilder<T>` — widget builder for frame-driven updates.
+- `DripBuilder<T>` — rebuilds a subtree on source changes.
+- `DripSelect` — rebuilds only when the selected slice changes.
+- `DripAsyncBuilder<T>` — handles `DripAsyncValue<T>` states with slots.
+- `DripItemBuilder<T>` — builds a single item from `DripItems<T>`.
+- `DripLifecycle<N>` — creates and disposes a node-backed scope with the widget.
+- `DripScope.asWidget()` — wraps an existing scope as a widget ancestor.
+- `DripSemantics<T>` — bridges reactive values into the semantics tree.
+- `DripNode` — optional feature-module convenience base class.
+- `DripAsyncNode` — optional async helper mixin for `DripNode`.
+
+### Changed
+- `DripNode` and `DripAsyncNode` documentation now explicitly presents them
+  as optional convenience patterns, not required architectural components.
+- `DripSelect2`, `DripSelect3`, and `DripSelect4` are internalized behind the
+  frozen `DripSelect.two`, `DripSelect.three`, and `DripSelect.four` entry
+  points.
+- `DripFlutterBinding` remains an internal integration bridge and is no longer
+  exported from the public barrel.
+- `DripAsyncNodeMixin` is replaced by the frozen `DripAsyncNode` mixin name.
+
+### Removed
+- `DripReadableX` and its `asString`, `map`, and `where` convenience methods
+  were removed from the public surface because they are not part of the frozen
+  Flutter API.
+
+## 0.6.0-alpha (2026-05-17)
+
+### BREAKING CHANGES
+This release removes all APIs deprecated in 0.5.1-alpha. If your code uses any
+of the following, it will not compile after this upgrade. See MIGRATION.md for
+the replacement for each:
+
+- `DripNodeProvider` — use `DripLifecycle`.
+- `context.node<N>()` — use `DripLifecycle` and explicit dependency passing.
+- `DripRouteNode` — use `DripLifecycle` with a route observer.
+- `DripList<T>` — use `DripItems<T>` from drip_core.
+- `DripListView<T>` — use `DripItemBuilder` from drip_flutter.
+
+### Changed
+- `drip_core` dependency updated to `^1.0.0` (stable).
+
+---
+
 ## 0.5.1-alpha (2026-05-16)
 
 ### Added
+- **`DripItemBuilder<T>`**: Reactive builder that binds to a specific element index of a `DripItems` collection, supporting standard rebuilding or high-performance zero-rebuild direct render binding mode.
 - **`DripSemantics`**: Accessibility bridge for `DripReadable<T>`. Synchronizes reactive values to the semantics tree with debounced updates.
 - **`DripLifecycle`**: High-level widget for managing `DripNode` or `DripScope` lifetimes without `InheritedWidget`. Enforces context-free injection.
 - **`DripScope.asWidget()`**: Extension to easily bind a scope's disposal to a widget's lifecycle.
 
 ### Deprecated
 - `DripNodeProvider`, `context.node()`, `DripRouteNode`, `DripList`, and `DripListView` are now deprecated.
-- **Migration**: Use `DripLifecycle` for node management and `DripBuilder` for list updates.
+- **Migration**: Use `DripLifecycle` for node management, `DripItems` as the list-state model, and `DripItemBuilder` for list item rendering.
 
 ### Changed
 - `DripBinding`: Now integrates with `DripTrace` to provide diagnostic context on render property updates.
