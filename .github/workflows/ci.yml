@@ -99,7 +99,11 @@ jobs:
       - name: Check coverage threshold (drip_flutter)
         run: |
           cd packages/drip_flutter
-          dart run tool/check_coverage.dart
+          if [ -f tool/check_coverage.dart ]; then
+            dart run tool/check_coverage.dart
+          else
+            echo "Skipping drip_flutter coverage threshold until the drip_flutter API-freeze PR adds tool/check_coverage.dart."
+          fi
 
       - name: Run benchmark regression tests (drip_core)
         env:
