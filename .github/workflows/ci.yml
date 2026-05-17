@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FLUTTER_VERSION: '3.27.0'
+  FLUTTER_VERSION: '3.35.2'
 
 jobs:
   # ─────────────────────────────────────────────
@@ -33,18 +33,26 @@ jobs:
           cache: true
 
       - name: Install Melos
-        # Pin to a specific version so supply-chain attacks cannot inject code
-        # via a compromised "latest" tag.
         run: dart pub global activate melos 6.3.2
 
       - name: Bootstrap workspace
         run: melos bootstrap
 
-      - name: Dart format check
-        run: melos run format:check --no-select
+      - name: Check format (drip_core)
+        run: dart format --output=none --set-exit-if-changed packages/drip_core
 
-      - name: Static analysis (fatal-infos + fatal-warnings)
-        run: melos run analyze --no-select
+      - name: Check format (drip_flutter)
+        run: dart format --output=none --set-exit-if-changed packages/drip_flutter
+
+      - name: Analyze drip_core
+        run: |
+          cd packages/drip_core
+          dart analyze --fatal-infos --fatal-warnings
+
+      - name: Analyze drip_flutter
+        run: |
+          cd packages/drip_flutter
+          flutter analyze --fatal-infos --fatal-warnings
 
   # ─────────────────────────────────────────────
   # Job 2: Tests
@@ -72,8 +80,44 @@ jobs:
       - name: Bootstrap workspace
         run: melos bootstrap
 
-      - name: Run tests with coverage
-        run: melos run test:coverage --no-select
+      - name: Run tests (drip_core)
+        run: |
+          cd packages/drip_core
+          dart test --coverage=coverage
+
+      - name: Check coverage threshold (drip_core)
+        run: |
+          cd packages/drip_core
+          dart run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --report-on=lib
+          dart run tool/check_coverage.dart
+
+      - name: Run tests (drip_flutter)
+        run: |
+          cd packages/drip_flutter
+          flutter test --coverage
+
+      - name: Check coverage threshold (drip_flutter)
+        run: |
+          cd packages/drip_flutter
+          if [ -f tool/check_coverage.dart ]; then
+            dart run tool/check_coverage.dart
+          else
+            echo "Skipping drip_flutter coverage threshold until the drip_flutter API-freeze PR adds tool/check_coverage.dart."
+          fi
+
+      - name: Run benchmark regression tests (drip_core)
+        env:
+          # GitHub-hosted runners vary enough that the local 10M writes/sec
+          # release claim is too noisy as a CI hard gate. CI still fails on
+          # major regressions while the benchmark keeps reporting the measured
+          # throughput on every PR.
+          DRIP_MIN_WRITE_THROUGHPUT: '5000000'
+        run: |
+          cd packages/drip_core
+          dart run benchmark/write_throughput.dart
+          dart run benchmark/diamond_correctness.dart
+          dart run benchmark/propagation_scaling.dart
+          dart run benchmark/scope_disposal.dart
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5

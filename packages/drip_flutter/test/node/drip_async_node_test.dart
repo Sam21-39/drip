@@ -21,7 +21,7 @@ void main() {
   group('DripAsyncNodeMixin', () {
     test('AN-1.1: runAsync() returns DripAsync<T> in loading state', () {
       final node = TestAsyncNode();
-      expect(node.futureAsync.value, isA<DripLoading<int>>());
+      expect(node.futureAsync.value, isA<DripAsyncLoading<int>>());
     });
 
     test('AN-1.2: runAsync() disposed when node disposed', () {
@@ -38,27 +38,27 @@ void main() {
 
     test('AN-1.3: runAsync() transitions to data on completion', () async {
       final node = TestAsyncNode();
-      expect(node.futureAsync.value, isA<DripLoading<int>>());
+      expect(node.futureAsync.value, isA<DripAsyncLoading<int>>());
 
       node.futureCompleter.complete(42);
       await Future.microtask(() {}); // let run finish
 
-      expect(node.futureAsync.value, isA<DripData<int>>());
+      expect(node.futureAsync.value, isA<DripAsyncData<int>>());
       expect(node.futureAsync.value.dataOrNull, 42);
     });
 
     test('AN-1.4: watchStream() transitions through states', () async {
       final node = TestAsyncNode();
-      expect(node.streamAsync.value, isA<DripLoading<int>>());
+      expect(node.streamAsync.value, isA<DripAsyncLoading<int>>());
 
       node.streamController.add(1);
       await Future.microtask(() {});
-      expect(node.streamAsync.value, isA<DripData<int>>());
+      expect(node.streamAsync.value, isA<DripAsyncData<int>>());
       expect(node.streamAsync.value.dataOrNull, 1);
 
       node.streamController.addError(Exception('error'));
       await Future.microtask(() {});
-      expect(node.streamAsync.value, isA<DripError<int>>());
+      expect(node.streamAsync.value, isA<DripAsyncError<int>>());
     });
 
     test('AN-1.5: watchStream() subscription cancelled on dispose()', () async {

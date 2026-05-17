@@ -1,0 +1,52 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - 'drip_core-v[0-9]+.[0-9]+.[0-9]+*'
+      - 'drip_flutter-v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  verify-main-release-tag:
+    name: Verify tag is on main
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Require release tag to be merged on main
+        run: |
+          set -euo pipefail
+          git fetch --force origin main:refs/remotes/origin/main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "Release tags may only publish commits already merged to main."
+            echo "Tag: $GITHUB_REF_NAME"
+            echo "SHA: $GITHUB_SHA"
+            exit 1
+          fi
+
+  publish-drip-core:
+    name: Publish drip_core
+    needs: verify-main-release-tag
+    if: startsWith(github.ref_name, 'drip_core-v')
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+    with:
+      working-directory: packages/drip_core
+      environment: pub.dev
+
+  publish-drip-flutter:
+    name: Publish drip_flutter
+    needs: verify-main-release-tag
+    if: startsWith(github.ref_name, 'drip_flutter-v')
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+    with:
+      working-directory: packages/drip_flutter
+      environment: pub.dev

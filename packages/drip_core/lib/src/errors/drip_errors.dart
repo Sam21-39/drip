@@ -4,8 +4,8 @@ class DripCircularDependencyError extends Error {
   final String message;
 
   DripCircularDependencyError([this.debugName])
-      : message = 'Circular dependency detected' +
-            (debugName != null ? ' in "$debugName"' : '') +
+      : message = 'Circular dependency detected'
+            '${debugName != null ? ' in "$debugName"' : ''}'
             '. A DripComputed cannot read itself during its own computation.';
 
   @override
@@ -18,8 +18,8 @@ class DripDisposedScopeError extends Error {
   final String message;
 
   DripDisposedScopeError([this.debugName])
-      : message = 'Scope' +
-            (debugName != null ? ' "$debugName"' : '') +
+      : message = 'Scope'
+            '${debugName != null ? ' "$debugName"' : ''}'
             ' has been disposed. Cannot register new reactive resources.';
 
   @override

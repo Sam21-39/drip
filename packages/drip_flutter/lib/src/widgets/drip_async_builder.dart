@@ -3,7 +3,7 @@ import 'package:drip_core/drip_core.dart';
 
 /// An async state widget that renders subtrees based on the current [DripAsyncValue].
 ///
-/// Exhaustively switches over [DripLoading], [DripData], and [DripError].
+/// Exhaustively switches over [DripAsyncLoading], [DripAsyncData], and [DripAsyncError].
 /// All three callbacks are required to ensure robust error handling.
 class DripAsyncBuilder<T> extends StatefulWidget {
   final DripAsync<T> source;
@@ -61,9 +61,9 @@ class _DripAsyncBuilderState<T> extends State<DripAsyncBuilder<T>> {
   Widget build(BuildContext context) {
     final value = _currentAsyncValue;
     return switch (value) {
-      DripLoading<T>() => widget.loading(context, value.previousData),
-      DripData<T>() => widget.data(context, value.value),
-      DripError<T>() => widget.error(
+      DripAsyncLoading<T>() => widget.loading(context, value.previousData),
+      DripAsyncData<T>() => widget.data(context, value.value),
+      DripAsyncError<T>() => widget.error(
           context, value.error, value.stackTrace, value.previousData),
     };
   }

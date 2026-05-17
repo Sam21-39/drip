@@ -27,6 +27,7 @@ class DripComputed<T> extends DripStateBase
   }
 
   /// Returns the current value, recomputing if any dependency has changed.
+  @override
   T get value {
     TrackingContext.current?.recordRead(this);
 

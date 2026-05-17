@@ -1,4 +1,6 @@
-import 'package:drip_core/drip_core.dart';
+// ignore_for_file: implementation_imports
+import 'package:drip_core/src/batch/drip_batch.dart';
+import 'package:drip_core/src/batch/drip_scheduler_config.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 

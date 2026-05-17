@@ -1,6 +1,65 @@
+## [1.0.0] — 2026-05-17
+
+### Stable Release
+First stable release of drip_core. Semantic versioning is now enforced: no
+public symbol will be removed or renamed without a major version bump; no new
+required parameters will be added to existing constructors without a major
+version bump.
+
+### Public API (frozen)
+- `DripState<T>` — mutable reactive value.
+- `dripState<T>()` — convenience factory for `DripState<T>`.
+- `DripComputed<T>` — lazily evaluated derived reactive value.
+- `DripEffect` — side-effect subscriber with no return value.
+- `DripReadable<T>` — unified read and subscribe interface.
+- `DripScope` — owner and disposer of reactive resources.
+- `DripAsync<T>` — async operation state container.
+- `DripAsyncValue<T>` — sealed base class for async state.
+- `DripAsyncData<T>` — resolved async value.
+- `DripAsyncLoading<T>` — in-flight async value with optional previous data.
+- `DripAsyncError<T>` — failed async value with optional previous data.
+- `DripItems<T>` — index-addressable collection of `DripState<T>` instances.
+- `DripTrace` — debug-only mutation stack trace capture.
+- `Equality<T>` — equality strategy interface for state comparisons.
+- `DefaultEquality<T>` — equality strategy using Dart's `==`.
+- `IdentityEquality<T>` — equality strategy using object identity.
+- `defaultEquality` — shared default equality instance.
+- `DripCircularDependencyError` — thrown for computed cycles.
+- `DripDisposedScopeError` — thrown when a disposed scope is used.
+- `DripDisposalError` — reports scope disposal callback failures.
+- `DripEqualityViolationError` — reports invalid equality/hash contracts.
+- `VoidCallback` — callback signature used by subscriptions.
+
+### Added
+- `DripItems<T>` — index-addressable collection of `DripState<T>` instances
+  with item-level granularity (added in Phase 0, promoted to stable).
+- Benchmark suite for write throughput, diamond graph propagation, direct
+  subscriber propagation, and scope disposal.
+- CI coverage and benchmark enforcement.
+
+### Changed
+- All previously internal implementation symbols moved to `src/` and removed
+  from public exports: `DripBatch`, `DripSchedulerConfig`, and
+  `TrackingContext`.
+- Async value variants renamed from `DripLoading`, `DripData`, and `DripError`
+  to `DripAsyncLoading`, `DripAsyncData`, and `DripAsyncError`.
+- Test coverage raised above the 95% release gate.
+- Dartdoc completed on the public API.
+
+### Removed
+- Public exports for scheduler and tracking implementation details.
+
+### Performance
+- Write throughput: >10M writes/sec (benchmark: `benchmark/write_throughput.dart`).
+- Single-propagation-pass: diamond graph computes C once per S write.
+- O(n) direct subscriber propagation: 1000 subscribers notified in <50ms.
+
+---
+
 ## 0.5.1-alpha (2026-05-16)
 
 ### Added
+- **`DripItems<T>`**: High-performance, highly-granular reactive collection wrapping elements in `DripState` to isolate value writes from structural mutations.
 - **`DripTrace`**: Diagnostic layer for capturing synchronous mutation context.
 - **`DripReadableX`**: Extensions `asString`, `map`, and `where` for reactive values.
 

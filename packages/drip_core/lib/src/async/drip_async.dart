@@ -9,33 +9,33 @@ class DripAsync<T> extends DripState<DripAsyncValue<T>> {
   int _runGeneration = 0;
 
   /// Creates a new async state.
-  /// Initial value is [DripLoading] with no previous data.
+  /// Initial value is [DripAsyncLoading] with no previous data.
   DripAsync({String? debugName, DripScope? scope})
-      : super(DripLoading<T>(), debugName: debugName) {
+      : super(DripAsyncLoading<T>(), debugName: debugName) {
     if (scope != null) {
       scope.registerDisposal(clearAllSubscribers);
     }
   }
 
-  /// Writes a new [DripLoading], preserving [previousData] from current state.
+  /// Writes a new [DripAsyncLoading], preserving `previousData` from current state.
   void setLoading() {
     final current = value;
-    if (current is DripLoading<T>) {
+    if (current is DripAsyncLoading<T>) {
       // Retain its previous data (no double-wrap)
-      write(DripLoading<T>(previousData: current.previousData));
+      write(DripAsyncLoading<T>(previousData: current.previousData));
     } else {
-      write(DripLoading<T>(previousData: current.dataOrNull));
+      write(DripAsyncLoading<T>(previousData: current.dataOrNull));
     }
   }
 
-  /// Writes [DripData]. Always successful.
+  /// Writes [DripAsyncData]. Always successful.
   void setData(T value) {
-    write(DripData<T>(value));
+    write(DripAsyncData<T>(value));
   }
 
-  /// Writes [DripError], preserving [previousData] from current state.
+  /// Writes [DripAsyncError], preserving `previousData` from current state.
   void setError(Object error, StackTrace stackTrace) {
-    write(DripError<T>(error, stackTrace, previousData: value.dataOrNull));
+    write(DripAsyncError<T>(error, stackTrace, previousData: value.dataOrNull));
   }
 
   /// Executes [computation], transitioning through states.

@@ -118,5 +118,23 @@ void main() {
 
       expect(() => c.value, throwsA(isA<DripCircularDependencyError>()));
     });
+
+    test('2.8 dispose() clears dependencies and unsubscribes', () {
+      final a = dripState(0);
+      var computedRun = 0;
+      final c = DripComputed(() {
+        computedRun++;
+        return a.value + 1;
+      });
+
+      expect(c.value, 1);
+      expect(computedRun, 1);
+
+      c.dispose();
+
+      // Writing to dependency does not trigger any stale propagation to disposed computed
+      a.write(1);
+      expect(computedRun, 1);
+    });
   });
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: hash_and_equals
+
 import 'package:test/test.dart';
 import 'package:drip_core/drip_core.dart';
 
