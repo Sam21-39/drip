@@ -43,26 +43,23 @@ void main() {
 
   group('DripAsyncTester', () {
     test('reports loading to data transition', () async {
-      final scope = DripScope(debugName: 'test-scope');
-      addTearDown(scope.dispose);
+      final scope = createDripTestScope();
 
       final source = DripAsync<int>(scope: scope);
       final tester = DripAsyncTester(source);
 
       final runFuture = source.run(() async => 42);
 
-      expect(tester.isLoading, isTrue);
+      tester.expectLoading();
       await runFuture;
       await tester.flush();
 
-      expect(tester.isLoading, isFalse);
-      expect(tester.dataOrNull, 42);
+      tester.expectData(42);
       expect(tester.errorOrNull, isNull);
     });
 
     test('reports error transition', () async {
-      final scope = DripScope(debugName: 'test-scope');
-      addTearDown(scope.dispose);
+      final scope = createDripTestScope();
 
       final source = DripAsync<int>(scope: scope);
       final tester = DripAsyncTester(source);
@@ -70,9 +67,8 @@ void main() {
       await source.run(() async => throw StateError('boom'));
       await tester.flush();
 
-      expect(tester.isLoading, isFalse);
       expect(tester.dataOrNull, isNull);
-      expect(tester.errorOrNull, isA<StateError>());
+      tester.expectErrorType(StateError);
     });
   });
 }

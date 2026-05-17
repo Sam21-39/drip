@@ -49,4 +49,29 @@ class DripAsyncTester<T> {
     final value = source.value;
     return value is DripAsyncError<T> ? value.error : null;
   }
+
+  /// Asserts the source is in loading state.
+  void expectLoading() {
+    if (!isLoading) {
+      throw StateError('Expected loading state, but found ${source.value}.');
+    }
+  }
+
+  /// Asserts the source holds [expected] data.
+  void expectData(T expected) {
+    final value = source.value;
+    if (value is! DripAsyncData<T> || value.value != expected) {
+      throw StateError('Expected data($expected), but found $value.');
+    }
+  }
+
+  /// Asserts the source is in error state with [errorType].
+  void expectErrorType(Type errorType) {
+    final error = errorOrNull;
+    if (error == null || error.runtimeType != errorType) {
+      throw StateError(
+        'Expected error type $errorType, but found ${error?.runtimeType}.',
+      );
+    }
+  }
 }
