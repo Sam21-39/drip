@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   drip_core:
     path: ../drip_core
+  drip_flutter:
+    path: ../drip_flutter
 
 dev_dependencies:
   test: ^1.25.0
