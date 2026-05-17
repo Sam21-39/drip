@@ -9,8 +9,8 @@ Enable automated publishing in the pub.dev Admin tab for each package:
 
 | Package | Repository | Tag pattern |
 |---|---|---|
-| `drip_core` | `Sam21-39/drip` | `drip_core-v{{version}}` |
-| `drip_flutter` | `Sam21-39/drip` | `drip_flutter-v{{version}}` |
+| `drip_core` | `Sam21-39/drip` | `v{{version}}` |
+| `drip_flutter` | `Sam21-39/drip` | `v{{version}}` |
 
 If pub.dev is configured to require a GitHub environment, use the environment
 name `pub.dev`, matching `.github/workflows/publish.yml`.
@@ -23,15 +23,19 @@ matches the version in the tag and the release commit has been merged to
 contained in `origin/main`.
 
 ```bash
-git tag drip_core-v1.0.0
-git push origin drip_core-v1.0.0
+git tag v1.0.0
+git push origin v1.0.0
 
-git tag drip_flutter-v0.7.0-alpha
-git push origin drip_flutter-v0.7.0-alpha
+git tag v0.7.0-alpha
+git push origin v0.7.0-alpha
 ```
 
 The workflow uses Dart's official reusable publishing workflow:
 `dart-lang/setup-dart/.github/workflows/publish.yml@v1`.
+
+Because pub.dev validates the tag against the package version, release tags
+must use exactly `v{{version}}`. The workflow routes `v1.0.0` to
+`packages/drip_core` and `v0.7.0-alpha` to `packages/drip_flutter`.
 
 `drip_flutter` depends on `drip_core: ^1.0.0`, so publish and wait for
 `drip_core 1.0.0` indexing before pushing a `drip_flutter` release tag.

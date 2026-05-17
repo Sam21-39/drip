@@ -3,8 +3,7 @@ name: Publish to pub.dev
 on:
   push:
     tags:
-      - 'drip_core-v[0-9]+.[0-9]+.[0-9]+*'
-      - 'drip_flutter-v[0-9]+.[0-9]+.[0-9]+*'
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
   verify-main-release-tag:
@@ -32,7 +31,7 @@ jobs:
   publish-drip-core:
     name: Publish drip_core
     needs: verify-main-release-tag
-    if: startsWith(github.ref_name, 'drip_core-v')
+    if: github.ref_name == 'v1.0.0'
     permissions:
       id-token: write # Required for authentication using OIDC
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
@@ -43,7 +42,7 @@ jobs:
   publish-drip-flutter:
     name: Publish drip_flutter
     needs: verify-main-release-tag
-    if: startsWith(github.ref_name, 'drip_flutter-v')
+    if: github.ref_name == 'v0.7.0-alpha'
     permissions:
       id-token: write # Required for authentication using OIDC
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
