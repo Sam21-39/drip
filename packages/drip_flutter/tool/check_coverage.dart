@@ -17,6 +17,9 @@ void main() {
   var currentLinesHit = 0;
 
   final fileCoverages = <String, double>{};
+  const strictFileThresholds = <String, double>{
+    'src/widgets/drip_item_builder.dart': 100.0,
+  };
 
   for (final line in lines) {
     if (line.startsWith('SF:')) {
@@ -68,6 +71,21 @@ void main() {
     print(
         'FAIL: Total coverage is ${totalPercentage.toStringAsFixed(2)}%, below $threshold%.');
     exit(1);
+  }
+
+  for (final entry in strictFileThresholds.entries) {
+    final file = entry.key;
+    final min = entry.value;
+    final actual = fileCoverages[file];
+    if (actual == null) {
+      print('FAIL: Required coverage file not found in report: $file');
+      exit(1);
+    }
+    if (actual < min) {
+      print(
+          'FAIL: $file coverage is ${actual.toStringAsFixed(2)}%, below required ${min.toStringAsFixed(2)}%.');
+      exit(1);
+    }
   }
 
   print(
