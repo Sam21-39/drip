@@ -1,17 +1,18 @@
 name: drip_flutter
-description: "Flutter render layer for DRIP — direct RenderObject binding with zero widget rebuilds."
-version: 0.5.1-alpha
+description: "Flutter reactive render binding for DripState, enabling zero-rebuild UI updates through direct RenderObject synchronization."
+version: 0.7.0-alpha
 homepage: https://github.com/Sam21-39/drip
 repository: https://github.com/Sam21-39/drip
+issue_tracker: https://github.com/Sam21-39/drip/issues
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
-  flutter: '>=3.27.0'
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  drip_core: ^0.5.1-alpha
+  drip_core: ^1.0.0
   meta: ^1.15.0
 
 dev_dependencies:
@@ -25,3 +26,17 @@ topics:
   - flutter
   - rendering
   - performance
+
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
+
+screenshots:
+  - description: >
+      1000-cell live grid updating at 60fps with zero widget rebuilds.
+      Flutter DevTools shows 0 build() calls during continuous state updates.
+    path: screenshots/demo_grid.png

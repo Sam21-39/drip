@@ -1,7 +1,7 @@
-# DRIP v0.5.0-alpha API Audit
+# DRIP Phase A API Audit
 
 **Date:** May 2026
-**Phase:** 5 (Stability Pass Refinement)
+**Phase:** A (API Freeze)
 
 This document verifies every public symbol in `drip_core` and `drip_flutter` against the three core design criteria for DRIP 1.0.0.
 
@@ -16,14 +16,15 @@ This document verifies every public symbol in `drip_core` and `drip_flutter` aga
 |---|---|---|---|---|
 | `DripAsync` | ✅ Yes | ✅ Yes | ✅ Yes | Core async state carrier. |
 | `DripAsyncValue` | ✅ Yes | ✅ Yes | ✅ Yes | Sealed class. |
-| `DripBatch` | ✅ Yes | ✅ Yes | ✅ Yes | Scheduler engine. |
 | `DripEffect` | ✅ Yes | ✅ Yes | ✅ Yes | Side effects. |
 | `DripScope` | ✅ Yes | ✅ Yes | ✅ Yes | Lifetimes. |
 | `DripComputed` | ✅ Yes | ✅ Yes | ✅ Yes | Derived values. |
 | `DripState` | ✅ Yes | ✅ Yes | ✅ Yes | Mutable state. |
-| `dripState` | ✅ Yes | ✅ Yes | ✅ Yes | Factory function. |
+| `DripReadable` | ✅ Yes | ✅ Yes | ✅ Yes | Unified read/listen interface. |
+| `DripItems` | ✅ Yes | ✅ Yes | ✅ Yes | Index-addressable item states. |
+| `DripTrace` | ✅ Yes | ✅ Yes | ✅ Yes | Debug trace utility. |
 
-*Result:* `drip_core` passes 100%.
+*Result:* `drip_core` now exports only the frozen 1.0.0 public API. Scheduler, tracking, equality, and error internals live under `src/` and are not exported from the package barrel.
 
 ## `drip_flutter` Audit
 
@@ -35,15 +36,15 @@ This document verifies every public symbol in `drip_core` and `drip_flutter` aga
 | `DripTransform` | ✅ Yes | ✅ Yes | ✅ Yes | Zero-rebuild widget. |
 | `DripImage` | ✅ Yes | ✅ Yes | ✅ Yes | Zero-rebuild widget. |
 | `DripBuilder` | ✅ Yes | ✅ Yes | ✅ Yes | Takes state directly. |
+| `DripSelect` | ✅ Yes | ✅ Yes | ✅ Yes | Filters selected slices before rebuilding. |
 | `DripAsyncBuilder`| ✅ Yes | ✅ Yes | ✅ Yes | Takes state directly. |
+| `DripItemBuilder` | ✅ Yes | ✅ Yes | ✅ Yes | Item-level builder for `DripItems`. |
+| `DripLifecycle` | ✅ Yes | ✅ Yes | ✅ Yes | Creates and disposes a scope without inherited lookup. |
+| `DripSemantics` | ✅ Yes | ✅ Yes | ✅ Yes | Reactive accessibility bridge. |
 | `DripNode` | ✅ Yes | ✅ Yes | ✅ Yes | Standard class. |
-| `DripNodeProvider`| ❌ No | ✅ Yes | ✅ Yes | **DEPRECATED**. Uses InheritedWidget. |
-| `DripRouteNode` | ❌ No | ✅ Yes | ✅ Yes | **DEPRECATED**. Binds to RouteObserver. |
-| `context.node()` | ❌ No | ✅ Yes | ✅ Yes | **DEPRECATED**. Violates context-free state access. |
-| `DripList` | ✅ Yes | ✅ Yes | ✅ Yes | **DEPRECATED**. Unstable implementation. |
-| `DripListView` | ✅ Yes | ✅ Yes | ✅ Yes | **DEPRECATED**. Unstable implementation. |
+| `DripAsyncNode` | ✅ Yes | ✅ Yes | ✅ Yes | Optional async node convenience class. |
 
-*Result:* `drip_flutter` required deprecation of `DripNodeProvider`, `context.node`, `DripRouteNode`, `DripList`, and `DripListView` to comply with the context-free paradigm and stability standards. All non-compliant APIs have been marked `@Deprecated`.
+*Result:* `drip_flutter` removed `DripNodeProvider`, `context.node`, `DripRouteNode`, `DripList`, and `DripListView` in Phase A. Their replacements are documented in `MIGRATION.md`.
 
 ## Conclusion
-Following the deprecations, all recommended and stable APIs in the DRIP framework conform strictly to the three architectural criteria.
+Following the Phase A freeze, the exported APIs in the DRIP framework conform strictly to the three architectural criteria.

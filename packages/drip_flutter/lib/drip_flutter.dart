@@ -4,16 +4,12 @@
 /// zero-rebuild UI updates.
 library;
 
-// Flutter binding init hook
-export 'src/binding/drip_flutter_binding.dart';
-
-export 'src/render/drip_color.dart' show DripColor, DripColorRenderBox;
+export 'src/render/drip_color.dart' show DripColor;
 export 'src/render/drip_custom.dart' show DripCustomBinding;
 export 'src/render/drip_image.dart' show DripImage;
-export 'src/render/drip_opacity.dart' show DripOpacity, DripOpacityRenderBox;
-export 'src/render/drip_text.dart' show DripText, DripRenderParagraph;
-export 'src/render/drip_transform.dart'
-    show DripTransform, DripTransformRenderBox;
+export 'src/render/drip_opacity.dart' show DripOpacity;
+export 'src/render/drip_text.dart' show DripText;
+export 'src/render/drip_transform.dart' show DripTransform;
 
 // Structural rebuild tools
 export 'src/structural/drip_frame.dart' show DripFrame;
@@ -21,17 +17,11 @@ export 'src/structural/drip_frame_builder.dart' show DripFrameBuilder;
 
 // Node system
 export 'src/node/drip_node.dart';
-export 'src/node/drip_node_provider.dart';
-export 'src/node/drip_route_node.dart';
-export 'src/node/drip_node_context.dart';
-export 'src/node/drip_async_node_mixin.dart';
-export 'src/extensions/drip_readable_x.dart';
+export 'src/node/drip_async_node.dart';
 export 'src/widgets/drip_lifecycle.dart';
 export 'src/widgets/drip_scope_widget.dart';
 
-// List system
-export 'src/list/drip_list.dart';
-export 'src/list/drip_list_view.dart';
+export 'src/widgets/drip_item_builder.dart';
 
 // Reactive builder widgets (Phase 4)
 export 'src/widgets/drip_builder.dart';

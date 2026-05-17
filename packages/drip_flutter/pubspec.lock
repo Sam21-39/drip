@@ -44,9 +44,10 @@ packages:
   drip_core:
     dependency: "direct main"
     description:
-      path: "../drip_core"
-      relative: true
-    source: path
+      name: drip_core
+      sha256: "8fb96d4e284aee6fd32e42079c1f32a1d2948f450dcd439b6dd5090a7c86bcb7"
+      url: "https://pub.dev"
+    source: hosted
     version: "1.0.0"
   fake_async:
     dependency: transitive
@@ -209,4 +210,4 @@ packages:
     version: "14.3.0"
 sdks:
   dart: ">=3.8.0-0 <4.0.0"
-  flutter: ">=3.27.0"
+  flutter: ">=3.18.0-18.0.pre.54"

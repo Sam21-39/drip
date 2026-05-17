@@ -54,7 +54,7 @@ packages:
       path: "../../packages/drip_flutter"
       relative: true
     source: path
-    version: "0.5.1-alpha"
+    version: "0.7.0-alpha"
   fake_async:
     dependency: transitive
     description:

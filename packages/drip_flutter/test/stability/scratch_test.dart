@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:drip_core/drip_core.dart';
 import 'package:drip_flutter/drip_flutter.dart';
+import 'package:drip_flutter/src/render/drip_text.dart';
 
 class _CountingState<T> extends DripState<T> {
   int listenerAddCount = 0;

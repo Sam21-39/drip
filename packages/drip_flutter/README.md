@@ -5,9 +5,9 @@
 
 Flutter render layer for the DRIP framework.
 
-Provides direct `RenderObject` bindings that update the UI with **zero widget rebuilds**, a scoped business-logic architecture via **`DripNode`**, and a high-performance reactive list via **`DripList`**.
+Provides direct `RenderObject` bindings that update the UI with **zero widget rebuilds**, optional scoped business-logic helpers via **`DripNode`**, and high-performance granular reactive lists via **`DripItems`** and **`DripItemBuilder`**.
 
-> ⚠️ **Early Alpha**: APIs are stable within the alpha series but subject to change before v1.0.0.
+> **API frozen for alpha**: `0.7.0-alpha` is the frozen pre-1.0 Flutter surface. Removals now require a documented deprecation cycle.
 
 ---
 
@@ -25,11 +25,11 @@ Provides direct `RenderObject` bindings that update the UI with **zero widget re
 
 | Widget | Bound Property | RenderObject call |
 |---|---|---|
-| `DripText` | `DripValue<String>` | `markNeedsLayout()` |
-| `DripOpacity` | `DripValue<double>` | `markNeedsPaint()` |
-| `DripColor` | `DripValue<Color>` | `markNeedsPaint()` |
-| `DripTransform` | `DripValue<Matrix4>` | `markNeedsPaint()` |
-| `DripImage` | `DripValue<ImageProvider>` | async image resolution |
+| `DripText` | `DripReadable<String>` | `markNeedsLayout()` |
+| `DripOpacity` | `DripReadable<double>` | `markNeedsPaint()` |
+| `DripColor` | `DripReadable<Color>` | `markNeedsPaint()` |
+| `DripTransform` | `DripReadable<Matrix4>` | `markNeedsPaint()` |
+| `DripImage` | `DripReadable<ImageProvider>` | async image resolution |
 | `DripCustomBinding<T>` | any | developer-defined |
 
 ## Builder Widgets
@@ -90,15 +90,13 @@ Provide and consume (Context-Free):
 // Explicit dependency injection via constructor
 DripLifecycle<CounterNode>(
   create: () => CounterNode(),
-  child: DripBuilder<CounterNode>(
-    builder: (context, node) => Column(children: [
+  builder: (node) => Column(children: [
       DripText(node.displayText),
       DripOpacity(opacity: node.opacity, child: ElevatedButton(
         onPressed: node.increment,
         child: Icon(Icons.add),
       )),
     ]),
-  ),
 )
 ```
 
@@ -115,7 +113,26 @@ DripSemantics<int>(
 
 ### 4. Reactive Lists
 
-For lists, use standard `ListView.builder` combined with `DripBuilder` for item-level granularity, or use the legacy `DripList` (deprecated) for O(1) tile updates.
+For highly-granular reactive collections, use `DripItems<T>` in combination with `DripItemBuilder<T>`. This ensures that individual element updates do not trigger a full list rebuild, keeping element-level updates isolated and performant:
+
+```dart
+final items = DripItems<String>(['item A', 'item B']);
+
+// In build():
+ListView.builder(
+  itemCount: items.length,
+  itemBuilder: (context, index) {
+    return DripItemBuilder<String>(
+      items: items,
+      index: index,
+      builder: (context, value) => ListTile(title: Text(value)),
+    );
+  },
+);
+
+// Writing to an element updates ONLY that specific index tile — zero list-level rebuilds:
+items[0].write('Updated Item A');
+```
 
 
 ---
@@ -124,7 +141,7 @@ For lists, use standard `ListView.builder` combined with `DripBuilder` for item-
 
 1. **Zero `setState()`**: No `setState()` calls exist in the binding code path. `DripFrame` is the sole intentional exception, explicitly documented.
 2. **Binding Lifecycle**: All bindings are synchronously deregistered in `didUnmountRenderObject` — zero subscriber leaks.
-3. **Context Correctness**: `DripNodeProvider` wraps the builder child in a `Builder`, ensuring `context.node<N>()` resolves from a context below the `InheritedWidget`.
+3. **Context-Free Lifecycle**: `DripLifecycle` creates nodes in `initState`, passes them explicitly through its builder, and disposes them in `dispose`.
 
 ---
 
@@ -145,10 +162,10 @@ Open **Flutter DevTools → Performance → Track Widget Builds**: 1,000 `DripTe
 
 ```yaml
 dependencies:
-  drip_flutter: ^0.5.1-alpha
+  drip_flutter: ^0.7.0-alpha
 ```
 
-Requires Flutter `>=3.27.0`.
+Requires Flutter `>=3.10.0` and `drip_core ^1.0.0`.
 
 ---
 

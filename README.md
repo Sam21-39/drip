@@ -13,12 +13,12 @@ Sub-widget reactive state for Flutter. State changes propagate directly to `Rend
 
 ## Packages
 
-| Package | Version | Description |
-|---|---|---|
-| [`drip_core`](packages/drip_core) | `0.5.1-alpha` | Pure Dart reactive engine — `DripState`, `DripComputed`, `DripEffect`, `DripScope`, `DripTrace` |
-| [`drip_flutter`](packages/drip_flutter) | `0.5.1-alpha` | Flutter render layer — `DripText`, `DripOpacity`, `DripLifecycle`, `DripSemantics` |
-| `drip_core_native` | planned | FFI shared memory native bridge |
-| `drip_gen` | planned | Code generator + CLI |
+| Package | Version | Status | Description |
+|---|---|---|---|
+| [`drip_core`](packages/drip_core) | `1.0.0` | [![drip_core](https://img.shields.io/pub/v/drip_core?label=pub.dev)](https://pub.dev/packages/drip_core) | Pure Dart reactive engine — `DripState`, `DripComputed`, `DripEffect`, `DripScope`, `DripTrace` |
+| [`drip_flutter`](packages/drip_flutter) | `0.7.0-alpha` | [![drip_flutter](https://img.shields.io/pub/v/drip_flutter?label=pub.dev)](https://pub.dev/packages/drip_flutter) | Flutter render layer — `DripText`, `DripOpacity`, `DripLifecycle`, `DripSemantics`, `DripItems`, `DripItemBuilder` |
+| `drip_gen` | planned | Planned | Code generator + CLI |
+| `drip_native` | planned | Planned | FFI shared memory native bridge |
 
 ## Architecture
 
@@ -81,9 +81,7 @@ class CounterNode extends DripNode {
 // In your widget tree (Context-Free Injection):
 DripLifecycle<CounterNode>(
   create: () => CounterNode(),
-  child: DripBuilder<CounterNode>(
-    builder: (context, node) => DripText(node.displayText),
-  ),
+  builder: (node) => DripText(node.displayText),
 )
 ```
 
@@ -100,6 +98,12 @@ final count = dripState(0, debugName: 'counter');
 
 ---
 
+## Migration
+
+Upgrading from an older version of DRIP? Please read [MIGRATION.md](MIGRATION.md) for step-by-step instructions on replacing deprecated provider, route-node, and list APIs with `DripLifecycle`, `DripItems`, and `DripItemBuilder`.
+
+---
+
 ## Development Status
 
 | Version | Status | Description |
@@ -109,9 +113,10 @@ final count = dripState(0, debugName: 'counter');
 | `v0.3.0-alpha` | ✅ Released | Node architecture — `DripNode`, `DripNodeProvider`, `DripRouteNode`, `DripList`, `DripListView` |
 | `v0.4.0-alpha` | ✅ Released | Async layer — `DripAsync`, `DripAsyncValue`, `DripAsyncBuilder`, `DripSelect`, `DripAsyncNode` |
 | `v0.5.1-alpha` | ✅ Released | Phase 5: Stability — Diagnostic tracing, Semantics bridge, Lifecycle widgets, Context-free enforcement |
-| `v0.6.0-alpha` | 🔜 Next | Native bridge — FFI shared memory (Android + iOS) |
-| `v1.0.0-beta` | Planned | Code generation + CLI + Router integration |
-| `v1.0.0` | Planned | Stable |
+| `drip_core 1.0.0` | ✅ Ready | Stable core API, coverage gate, benchmark regression checks |
+| `drip_flutter 0.6.0-alpha` | ✅ Ready | Deprecated provider, route-node, and list APIs removed |
+| `drip_flutter 0.7.0-alpha` | ✅ Ready | Flutter API freeze for the pre-1.0 line |
+| `drip_flutter 1.0.0` | Planned | DevTools extension, migration guides, stress testing |
 
 ---
 
