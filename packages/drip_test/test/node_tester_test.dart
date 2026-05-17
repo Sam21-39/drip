@@ -30,6 +30,7 @@ void main() {
   group('DripNodeTester', () {
     test('drives lifecycle and dispose', () {
       final tester = DripNodeTester(_LifecycleNode.new);
+      tester.registerTearDown();
 
       tester.simulateBackground();
       tester.simulateForeground();
@@ -69,6 +70,29 @@ void main() {
 
       expect(tester.dataOrNull, isNull);
       tester.expectErrorType(StateError);
+    });
+
+    test('expectData throws on mismatch', () async {
+      final scope = createDripTestScope();
+      final source = DripAsync<int>(scope: scope);
+      final tester = DripAsyncTester(source);
+
+      await source.run(() async => 42);
+      await tester.flush();
+
+      expect(() => tester.expectData(7), throwsA(isA<StateError>()));
+    });
+
+    test('expectErrorType throws on mismatch', () async {
+      final scope = createDripTestScope();
+      final source = DripAsync<int>(scope: scope);
+      final tester = DripAsyncTester(source);
+
+      await source.run(() async => throw StateError('boom'));
+      await tester.flush();
+
+      expect(() => tester.expectErrorType(ArgumentError),
+          throwsA(isA<StateError>()));
     });
   });
 }

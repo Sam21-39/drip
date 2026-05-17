@@ -1,7 +1,6 @@
-import 'dart:async';
-
 import 'package:drip_core/drip_core.dart';
 import 'package:drip_flutter/drip_flutter.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// Test harness for driving [DripNode] lifecycle in unit tests.
 class DripNodeTester<T extends DripNode> {
@@ -24,6 +23,11 @@ class DripNodeTester<T extends DripNode> {
   /// Disposes the managed node.
   void dispose() {
     node.dispose();
+  }
+
+  /// Registers [dispose] with test teardown.
+  void registerTearDown() {
+    addTearDown(dispose);
   }
 }
 
