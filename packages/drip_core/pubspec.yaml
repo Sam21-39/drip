@@ -1,6 +1,6 @@
 name: drip_core
 description: "Pure Dart reactive state management with microtask batching and single-propagation-pass updates, with zero Flutter dependency."
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/Sam21-39/drip
 repository: https://github.com/Sam21-39/drip
 issue_tracker: https://github.com/Sam21-39/drip/issues
