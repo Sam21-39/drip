@@ -3,6 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:drip_core/drip_core.dart';
 import 'package:drip_flutter/drip_flutter.dart';
 
+Future<void> _pumpDrip(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump();
+}
+
 void main() {
   group('DripBuilder', () {
     testWidgets('Initial value rendered correctly',
@@ -37,7 +42,7 @@ void main() {
       );
 
       state.write('updated');
-      await tester.pumpAndSettle();
+      await _pumpDrip(tester);
 
       expect(find.text('updated'), findsOneWidget);
     });
@@ -64,12 +69,12 @@ void main() {
 
       // Write same value
       state.write('initial');
-      await tester.pumpAndSettle();
+      await _pumpDrip(tester);
 
       expect(buildCount, 1); // No rebuild
 
       state.write('updated');
-      await tester.pumpAndSettle();
+      await _pumpDrip(tester);
 
       expect(buildCount, 2);
     });
@@ -95,14 +100,14 @@ void main() {
       expect(buildCount, 1);
 
       // Write value with same length
-      state.write('abcde'); // "initial" is 7, "abcde" is 5... wait
+      state.write('abcde');
       state.write('1234567'); // same length as "initial"
-      await tester.pumpAndSettle();
+      await _pumpDrip(tester);
 
       expect(buildCount, 1); // No rebuild due to custom identity
 
       state.write('different');
-      await tester.pumpAndSettle();
+      await _pumpDrip(tester);
 
       expect(buildCount, 2);
     });

@@ -6,6 +6,15 @@ import '../binding/drip_binding.dart';
 /// Encapsulates the pattern established by [DripText], [DripOpacity], etc.,
 /// allowing developers to create custom high-performance bindings without
 /// re-implementing the core lifecycle logic.
+///
+/// EXPERT API — requires deep Flutter [RenderObject] lifecycle knowledge.
+/// Memory safety contract:
+///   1. Always override `didUnmountRenderObject` in your widget/adapter layer.
+///   2. Always call [dispose] (or your wrapper's `unbindState`) from that hook.
+///   3. Never trigger `markNeeds*` methods after disposal.
+///
+/// Violations can silently leak render references in production.
+/// See: `docs/CUSTOM_BINDING_SAFETY.md`.
 abstract class DripCustomBinding<T> {
   /// The reactive source.
   final DripReadable<T> source;

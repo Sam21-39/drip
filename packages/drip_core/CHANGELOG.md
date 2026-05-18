@@ -1,3 +1,12 @@
+## [1.0.1] — 2026-05-18
+
+### Changed
+- Documentation and release-readiness polish across README, changelog, and
+  package metadata.
+- CI/release verification runbook validated for stable `1.0.x` flow.
+
+---
+
 ## [1.0.0] — 2026-05-17
 
 ### Stable Release

@@ -1,6 +1,6 @@
 name: drip_flutter
 description: "Flutter reactive render binding for DripState, enabling zero-rebuild UI updates through direct RenderObject synchronization."
-version: 0.7.0-alpha
+version: 0.7.1-alpha
 homepage: https://github.com/Sam21-39/drip
 repository: https://github.com/Sam21-39/drip
 issue_tracker: https://github.com/Sam21-39/drip/issues
