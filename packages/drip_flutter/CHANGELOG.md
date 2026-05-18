@@ -1,3 +1,13 @@
+## [0.7.1-alpha] — 2026-05-18
+
+### Changed
+- Test-suite reliability improvements aligned with DRIP's two-pump reactive
+  contract in widget tests.
+- `drip_test` helper alignment for node lifecycle and async assertion coverage.
+- Final release-readiness documentation and metadata verification.
+
+---
+
 ## [0.7.0-alpha] — 2026-05-17
 
 ### API Freeze

@@ -6,8 +6,14 @@ environment:
   sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
   drip_core:
     path: ../drip_core
+  drip_flutter:
+    path: ../drip_flutter
 
 dev_dependencies:
   test: ^1.25.0

@@ -130,5 +130,61 @@ void main() {
       expect(renderText().text.toPlainText(), 'B');
       expect(buildCount, 0);
     });
+
+    testWidgets(
+        'renderMode true with non-String type falls back to standard builder',
+        (WidgetTester tester) async {
+      final items = DripItems<int>([1]);
+      int buildCount = 0;
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: DripItemBuilder<int>(
+            items: items,
+            index: 0,
+            renderMode: true,
+            builder: (context, value) {
+              buildCount++;
+              return Text('n:$value');
+            },
+          ),
+        ),
+      );
+
+      expect(find.byType(DripText), findsNothing);
+      expect(find.text('n:1'), findsOneWidget);
+      expect(buildCount, 1);
+    });
+
+    testWidgets(
+        'didUpdateWidget toggles renderMode and re-registers listeners correctly',
+        (WidgetTester tester) async {
+      final items = DripItems<String>(['A']);
+
+      Widget buildWidget(bool renderMode) {
+        return Directionality(
+          textDirection: TextDirection.ltr,
+          child: DripItemBuilder<String>(
+            items: items,
+            index: 0,
+            renderMode: renderMode,
+            builder: (context, value) => Text('v:$value'),
+          ),
+        );
+      }
+
+      await tester.pumpWidget(buildWidget(false));
+      expect(items[0].subscribers.length, 1);
+
+      await tester.pumpWidget(buildWidget(true));
+      // In renderMode, DripItemBuilder removes its listener, but DripText adds one.
+      expect(items[0].subscribers.length, 1);
+      expect(find.byType(DripText), findsOneWidget);
+
+      await tester.pumpWidget(buildWidget(false));
+      expect(items[0].subscribers.length, 1);
+      expect(find.text('v:A'), findsOneWidget);
+    });
   });
 }
